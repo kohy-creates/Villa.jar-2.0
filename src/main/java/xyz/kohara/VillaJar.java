@@ -7,19 +7,18 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import xyz.kohara.commands.ServerCommandListener;
 import xyz.kohara.tags.MessageListener;
-import xyz.kohara.tags.ReloadCommandListener;
-import xyz.kohara.tags.Tags;
 
 import java.util.Arrays;
 
 public class VillaJar {
 
-    private static final String token = System.getenv("token");
+    private static final String token = Config.getOption("token");
     private static final GatewayIntent[] intents = {GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS};
 
     public static JDA BOT;
-    public static final String BOT_NAME = "Arfy";
+    public static final String BOT_NAME = Config.getOption("bot_name");
     public static Guild BASEMENT;
     public static Role STAFF_ROLE;
 
@@ -32,16 +31,15 @@ public class VillaJar {
                 .build();
 
         BOT.addEventListener(new MessageListener());
-        BOT.addEventListener(new ReloadCommandListener());
-        Tags.createTagMap();
+        BOT.addEventListener(new ServerCommandListener());
 
         BOT.awaitReady();
         System.out.println("Bot " + BOT_NAME + " is online!");
 
-        BASEMENT = BOT.getGuildById(System.getenv("server"));
-        STAFF_ROLE = BOT.getRoleById(System.getenv("staff_role"));
+        BASEMENT = BOT.getGuildById(Config.getOption("server_id"));
+        STAFF_ROLE = BOT.getRoleById(Config.getOption("staff_role_id"));
 
-        SlashCommands.register();
+        VillaJar.getServer().updateCommands().addCommands(SlashCommands.COMMANDS).queue();
     }
 
     public static Guild getServer() {

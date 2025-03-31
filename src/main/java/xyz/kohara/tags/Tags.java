@@ -21,10 +21,18 @@ import java.util.Map;
 
 public class Tags {
 
-    public final static String TAGS_FOLDER = "config/tags/";
+    public final static String TAGS_FOLDER = "data/tags/";
 
     public static Map<String, String> TAGS = new HashMap<>();
     public static Map<String, ArrayList<String>> CATEGORIES = new HashMap<>();
+
+    static {
+        try {
+            createTagMap();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static String getTag(String id) {
         return TAGS.get(id);
@@ -83,8 +91,6 @@ public class Tags {
                 }
             }
         }
-        System.out.println(TAGS);
-        System.out.println(CATEGORIES);
     }
 
     private static String tagName(File file) {

@@ -1,22 +1,28 @@
 package xyz.kohara;
 
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import xyz.kohara.commands.ServerCommandListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Map;
 
 public class SlashCommands {
 
-    private static final ArrayList<CommandData> SLASH_COMMANDS = new ArrayList<>();
+    public static final ArrayList<CommandData> COMMANDS = new ArrayList<>();
 
     static {
-        SLASH_COMMANDS.add(Commands.slash("reload_tags", "Reloads tags"));
-        SLASH_COMMANDS.add(Commands.slash("ping", "Pong!"));
-    }
+        COMMANDS.add(Commands.slash("ping", "Pong!"));
 
-    public static void register() {
-        VillaJar.getServer().updateCommands().addCommands(SLASH_COMMANDS).queue();
+        OptionData serverOption = new OptionData(OptionType.STRING, "server", "Discord server", true);
+        for (Map.Entry<String, String> entry : ServerCommandListener.SERVER_LIST.entrySet()) {
+            serverOption.addChoice(entry.getKey(), entry.getValue());
+        }
+
+        COMMANDS.add(Commands.slash("discord", "Get links for other Discord servers")
+                .addOptions(serverOption,
+                        new OptionData(OptionType.BOOLEAN, "public", "Send the answer publicly?", false)));
     }
 }
