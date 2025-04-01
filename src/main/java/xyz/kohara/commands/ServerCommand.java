@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class ServerCommandListener extends ListenerAdapter {
+public class ServerCommand extends ListenerAdapter {
 
     public static Map<String, String> SERVER_LIST;
 

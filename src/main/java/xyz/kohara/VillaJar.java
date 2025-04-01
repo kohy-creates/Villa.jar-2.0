@@ -7,9 +7,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import org.apache.commons.logging.Log;
-import xyz.kohara.commands.ServerCommandListener;
-import xyz.kohara.commands.TagListCommandListener;
+import xyz.kohara.commands.AvatarCommand;
+import xyz.kohara.commands.ServerCommand;
+import xyz.kohara.commands.TagListCommand;
 import xyz.kohara.tags.MessageListener;
 
 import java.util.Arrays;
@@ -33,8 +33,9 @@ public class VillaJar {
                 .build();
 
         BOT.addEventListener(new MessageListener());
-        BOT.addEventListener(new ServerCommandListener());
-        BOT.addEventListener(new TagListCommandListener());
+        BOT.addEventListener(new ServerCommand());
+        BOT.addEventListener(new TagListCommand());
+        BOT.addEventListener(new AvatarCommand());
         BOT.addEventListener(new LogUploader());
 
         BOT.awaitReady();

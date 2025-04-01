@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
-public class TagListCommandListener extends ListenerAdapter {
+public class TagListCommand extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
