@@ -66,8 +66,6 @@ public class Tags {
                     if (!yamlContent.isEmpty()) {
                         Yaml yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
                         Map<String, Object> metadata = yaml.load(yamlContent.toString());
-
-                        metadata.putIfAbsent("category", "none") ;
                         metadata.forEach((key, value) -> {
                             String object = value.toString();
                             switch (key) {
@@ -78,6 +76,7 @@ public class Tags {
                                     }
                                     tags.add(tagName);
                                     CATEGORIES.put(object, tags);
+
                                 }
                                 case "aliases" -> {
                                     String[] array = object.split(",");

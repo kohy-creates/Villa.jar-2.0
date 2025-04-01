@@ -24,5 +24,9 @@ public class SlashCommands {
         COMMANDS.add(Commands.slash("discord", "Get links for other Discord servers")
                 .addOptions(serverOption,
                         new OptionData(OptionType.BOOLEAN, "public", "Send the answer publicly?", false)));
+
+        COMMANDS.add(Commands.slash("tags","List all registered tags")
+                .addOption(OptionType.BOOLEAN, "public", "Send the answer publicly?", false)
+        );
     }
 }
