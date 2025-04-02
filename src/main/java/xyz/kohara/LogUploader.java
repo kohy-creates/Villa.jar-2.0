@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPInputStream;
 
 public class LogUploader extends ListenerAdapter {
@@ -46,9 +46,7 @@ public class LogUploader extends ListenerAdapter {
         if (event.getAuthor().isBot()) return;
 
         Map<File, String> fileMap = new HashMap<>();
-        AtomicBoolean canContinue = new AtomicBoolean(false);
-        AtomicBoolean exceptionOccurred = new AtomicBoolean(false);
-
+        AtomicInteger iter = new AtomicInteger();
         event.getMessage().getAttachments().stream()
                 .filter(attachment -> attachment.getFileName().matches(".*\\.(log|txt|gz)$"))
                 .forEach(attachment -> {
@@ -58,10 +56,9 @@ public class LogUploader extends ListenerAdapter {
                     extension = (extension.equals("gz")) ? "log" : extension;
                     File tempFile = new File(LOGS_FOLDER, "temp-" + Math.random() * 1_000_001 + "." + extension);
                     fileMap.put(tempFile, attachment.getFileName());
-
                     attachment.getProxy().download().thenAccept(inputStream -> {
                         try {
-
+                            iter.addAndGet(1);
                             if (Objects.equals(attachment.getFileExtension(), "gz")) {
                                 saveInputStreamToFile(inputStream, new File(tempFile + ".gz"));
                                 decompressGzipFile(tempFile + ".gz", tempFile.toString());
@@ -69,32 +66,18 @@ public class LogUploader extends ListenerAdapter {
                                 saveInputStreamToFile(inputStream, tempFile);
                             }
 
-                            if (fileMap.size() == event.getMessage().getAttachments().size()) {
-                                canContinue.set(true);
+                            if (iter.get() == event.getMessage().getAttachments().size()) {
+                                CompletableFuture.runAsync(() -> uploadAndSendLinks(fileMap, event));
                             }
 
                         } catch (IOException e) {
-                            exceptionOccurred.set(true);
                             event.getChannel().sendMessage("❌ Error saving file `" + attachment.getFileName() + "`").queue();
+                            tempFile.delete();
                             e.printStackTrace();
 
                         }
                     });
                 });
-        while (!canContinue.get() && !exceptionOccurred.get()) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        if (!exceptionOccurred.get()) {
-            CompletableFuture.runAsync(() -> uploadAndSendLinks(fileMap, event));
-        } else {
-            for (File file : Objects.requireNonNull(LOGS_FOLDER.listFiles())) {
-                file.delete();
-            }
-        }
     }
 
     private void saveInputStreamToFile(InputStream inputStream, File file) throws IOException {
