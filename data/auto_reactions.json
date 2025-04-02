@@ -1,0 +1,29 @@
+{
+  "1": {
+    "phrases": [
+      "test1",
+      "test2"
+    ],
+    "reactions": [
+      "📜",
+      "✅"
+    ]
+  },
+  "2": {
+    "phrases": [
+      "test3",
+      "test6"
+    ],
+    "reactions": [
+      "❌"
+    ]
+  },
+  "3": {
+    "phrases": [
+      "fnaf"
+    ],
+    "reactions": [
+      "<:fnafworld:1357005436716453978>"
+    ]
+  }
+}

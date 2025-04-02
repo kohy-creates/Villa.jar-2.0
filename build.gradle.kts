@@ -24,6 +24,7 @@ dependencies {
     implementation("dev.lavalink.youtube:common:1.12.0")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.2")
     implementation("org.apache.httpcomponents.core5:httpcore5:5.2")
+    implementation("com.github.minndevelopment:emoji-java:master-SNAPSHOT")
 }
 
 tasks.test {
