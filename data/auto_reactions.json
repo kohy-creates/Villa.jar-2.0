@@ -25,5 +25,13 @@
     "reactions": [
       "<:fnafworld:1357005436716453978>"
     ]
+  },
+  "4": {
+    "phrases": [
+      "regex:^(?i)(?=.*\\bvilla\\.jar\\b)(?=.*\\bhello\\b).*$"
+    ],
+    "reactions": [
+      "👋"
+    ]
   }
 }

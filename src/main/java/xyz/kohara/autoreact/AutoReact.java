@@ -12,6 +12,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class AutoReact extends ListenerAdapter {
     private static final String CONFIG_PATH = "data/auto_reactions.json";
@@ -42,7 +43,7 @@ public class AutoReact extends ListenerAdapter {
         if (event.getAuthor().isBot()) return;
         String messageContent = event.getMessage().getContentRaw();
         for (String key : AUTO_REACTIONS.keySet()) {
-            if (messageContent.contains(key)) {
+            if ((key.indexOf("regex:") == 0 && Pattern.compile(key.substring(6)).matcher(messageContent).matches()) || messageContent.contains(key)) {
                 for (String emoji : AUTO_REACTIONS.get(key)) {
                     Emoji reaction = Emoji.fromFormatted(emoji);
                     event.getMessage().addReaction(reaction).queue();
