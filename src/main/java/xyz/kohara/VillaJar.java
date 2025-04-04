@@ -14,6 +14,8 @@ import xyz.kohara.commands.TagListCommand;
 import xyz.kohara.tags.MessageListener;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class VillaJar {
 
@@ -59,5 +61,18 @@ public class VillaJar {
 
     public static boolean isStaff(Member member) {
         return member.getRoles().contains(STAFF_ROLE);
+    }
+
+    public static String toSmallUnicode(String s) {
+        Map<Character, Character> map = new HashMap<>();
+        String[] mappings = {"aᴀ", "bʙ", "cᴄ", "dᴅ", "eᴇ", "fꜰ", "gɢ", "hʜ", "iɪ", "jᴊ", "kᴋ", "lʟ", "mᴍ", "nɴ", "oᴏ", "pᴘ", "rʀ", "sѕ", "tᴛ", "uᴜ", "wᴡ", "xх", "yʏ", "zᴢ"};
+        for (String pair : mappings) {
+            map.put(pair.charAt(0), pair.charAt(1));
+        }
+        StringBuilder result = new StringBuilder();
+        for (char c : s.toCharArray()) {
+            result.append(map.getOrDefault(c, c));
+        }
+        return result.toString();
     }
 }
