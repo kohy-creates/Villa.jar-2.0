@@ -12,7 +12,7 @@ import java.util.Map;
 public class SlashCommands {
 
     public static final ArrayList<CommandData> COMMANDS = new ArrayList<>();
-    private static final String PUBLICLY_TIP = "Share the output with everyone?";
+    private static final String SEND_PUBLICLY_TIP = "Share the output with everyone?";
 
     static {
         COMMANDS.add(Commands.slash("ping", "Pong!"));
@@ -24,15 +24,23 @@ public class SlashCommands {
 
         COMMANDS.add(Commands.slash("discord", "Get links for other Discord servers")
                 .addOptions(serverOption,
-                        new OptionData(OptionType.BOOLEAN, "public", PUBLICLY_TIP, false)));
+                        new OptionData(OptionType.BOOLEAN, "public", SEND_PUBLICLY_TIP, false)));
 
         COMMANDS.add(Commands.slash("tags","List all registered tags")
-                .addOption(OptionType.BOOLEAN, "public", PUBLICLY_TIP, false)
+                .addOption(OptionType.BOOLEAN, "public", SEND_PUBLICLY_TIP, false)
         );
 
         COMMANDS.add(Commands.slash("avatar","Returns the avatar (profile picture) of the chosen user")
                 .addOption(OptionType.USER, "user", "User", true)
-                .addOption(OptionType.BOOLEAN, "public", PUBLICLY_TIP, false)
+                .addOption(OptionType.BOOLEAN, "public", SEND_PUBLICLY_TIP, false)
+        );
+
+        COMMANDS.add(Commands.slash("close","Closes the support thread")
+                .addOptions(
+                        new OptionData(OptionType.STRING, "action", "Resolve or invalidate", false)
+                                .addChoice("Resolve","resolve")
+                                .addChoice("Invalidate","invalid")
+                )
         );
     }
 }

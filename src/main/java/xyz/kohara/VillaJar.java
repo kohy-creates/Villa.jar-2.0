@@ -7,10 +7,12 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import org.jetbrains.annotations.NotNull;
 import xyz.kohara.autoreact.AutoReact;
 import xyz.kohara.commands.AvatarCommand;
 import xyz.kohara.commands.ServerCommand;
 import xyz.kohara.commands.TagListCommand;
+import xyz.kohara.support.ForumManager;
 import xyz.kohara.tags.MessageListener;
 
 import java.util.Arrays;
@@ -35,20 +37,22 @@ public class VillaJar {
                 .setActivity(Activity.customStatus("owo"))
                 .build();
 
-        BOT.addEventListener(new MessageListener());
-        BOT.addEventListener(new ServerCommand());
-        BOT.addEventListener(new TagListCommand());
-        BOT.addEventListener(new AvatarCommand());
-        BOT.addEventListener(new LogUploader());
-        BOT.addEventListener(new AutoReact());
-
         BOT.awaitReady();
         System.out.println("Bot " + BOT_NAME + " is online!");
 
         BASEMENT = BOT.getGuildById(Config.getOption("server_id"));
         STAFF_ROLE = BOT.getRoleById(Config.getOption("staff_role_id"));
 
-        VillaJar.getServer().updateCommands().addCommands(SlashCommands.COMMANDS).queue();
+        BOT.addEventListener(new MessageListener());
+        BOT.addEventListener(new ServerCommand());
+        BOT.addEventListener(new TagListCommand());
+        BOT.addEventListener(new AvatarCommand());
+        BOT.addEventListener(new LogUploader());
+        BOT.addEventListener(new AutoReact());
+        BOT.addEventListener(new ForumManager());
+
+        VillaJar.BASEMENT.updateCommands().addCommands(SlashCommands.COMMANDS).queue();
+        ForumManager.scheduleReminderCheck();
     }
 
     public static Guild getServer() {

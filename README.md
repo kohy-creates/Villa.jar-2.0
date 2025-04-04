@@ -6,6 +6,7 @@ For testing, create a file `data/config.json` and set it to this:
   "token": "",
   "server_id": "",
   "staff_role_id": "",
-  "bot_name": ""
+  "bot_name": "",
+  "support_channel": ""
 }
 ```
