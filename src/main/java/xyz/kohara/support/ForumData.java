@@ -19,7 +19,7 @@ public class ForumData {
         if (!FORUM_DATA.exists()) {
             try {
                 if (FORUM_DATA.createNewFile())
-                    try (FileWriter writer = new FileWriter(FORUM_DATA);) {
+                    try (FileWriter writer = new FileWriter(FORUM_DATA)) {
                         writer.write("{}");
                     }
             } catch (Exception e) {

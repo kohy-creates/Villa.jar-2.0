@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import org.jetbrains.annotations.NotNull;
 import xyz.kohara.autoreact.AutoReact;
 import xyz.kohara.commands.AvatarCommand;
 import xyz.kohara.commands.ServerCommand;
