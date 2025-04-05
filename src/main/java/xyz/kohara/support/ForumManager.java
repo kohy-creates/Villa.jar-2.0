@@ -16,6 +16,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import xyz.kohara.Config;
 import xyz.kohara.VillaJar;
@@ -52,6 +54,10 @@ public class ForumManager extends ListenerAdapter {
         }
     }
 
+    private static boolean hasThreadManagementPerms(Member member) {
+        return (VillaJar.isDev(member) || VillaJar.isStaff(member));
+    }
+
     private static String REMINDER_MESSAGE(String member, boolean addReminder) throws IOException {
         String text = Files.readString(Paths.get("data/forum/reminder_message.md")).trim();
         text = text.replace("{MEMBER}", "<@" + member + ">");
@@ -62,8 +68,8 @@ public class ForumManager extends ListenerAdapter {
 
     }
 
-    private static String INVALID_MESSAGE() throws IOException {
-        return Files.readString(Paths.get("data/forum/invalid.md")).trim();
+    private static String INVALID_MESSAGE(boolean DM) throws IOException {
+        return Files.readString(Paths.get((DM) ? "data/forum/invalid_dm.md" : "data/forum/invalid.md")).trim();
     }
 
     private static EmbedBuilder supportEmbed(Member member) throws IOException {
@@ -129,8 +135,7 @@ public class ForumManager extends ListenerAdapter {
         try {
             if (channel.isLocked()) {
                 if (channel.isPinned()) return;
-
-                Thread.sleep(1000);
+                Thread.sleep(500);
                 channel.getManager().setArchived(true).queue();
             } else {
                 String id = channel.getId();
@@ -139,7 +144,7 @@ public class ForumManager extends ListenerAdapter {
                     String op = ForumData.getEntryValue(id, "op");
                     switch (content) {
                         case "✅" -> {
-                            if (op.equals(Objects.requireNonNull(event.getMember()).getId()) || VillaJar.isStaff(event.getMember())) {
+                            if (op.equals(Objects.requireNonNull(event.getMember()).getId()) || hasThreadManagementPerms(event.getMember())) {
                                 event.getMessage().addReaction(Emoji.fromFormatted("✅")).queue();
                                 event.getChannel().sendMessage("✅").queue();
                                 closePost(channel, "resolved");
@@ -215,8 +220,10 @@ public class ForumManager extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         if (event.getName().equals("close")) {
-            if (event.getChannel().getType() != ChannelType.GUILD_PUBLIC_THREAD && !isSupportThread(event.getChannel().asThreadChannel()))
+            if (event.getChannel().getType() != ChannelType.GUILD_PUBLIC_THREAD && !isSupportThread(event.getChannel().asThreadChannel())) {
+                event.reply(":x: **This command can only be used in <#" + Config.getOption("support_channel_id") + "> threads!**").setEphemeral(true).queue();
                 return;
+            }
             try {
                 ThreadChannel thread = event.getChannel().asThreadChannel();
                 String id = thread.getId();
@@ -224,12 +231,35 @@ public class ForumManager extends ListenerAdapter {
                 String action = option != null ? option.getAsString() : "resolve";
                 String op = ForumData.getEntryValue(id, "op");
                 boolean isOP = op.equals(Objects.requireNonNull(event.getMember()).getId());
-                boolean staff = VillaJar.isStaff(event.getMember());
+                boolean staff = hasThreadManagementPerms(event.getMember());
                 if ((action.equals("resolve") && isOP) || ((action.equals("resolve") && staff))) {
                     event.reply(":white_check_mark:").queue();
                     closePost(thread, "resolved");
                 } else if (action.equals("invalid") && staff) {
-                    event.reply(INVALID_MESSAGE()).queue();
+                    VillaJar.getBot().retrieveUserById(op).queue(
+                            user -> user.openPrivateChannel().queue(
+                                    privateChannel -> {
+                                        try {
+                                            String text = INVALID_MESSAGE(true);
+                                            text = text.replace("{THREAD}", thread.getAsMention());
+                                            privateChannel
+                                                    .sendMessage(text)
+                                                    .setActionRow(
+                                                            Button.of(
+                                                                            ButtonStyle.PRIMARY,
+                                                                            "sent_from",
+                                                                            "Sent from " + VillaJar.getServer().getName(), Emoji.fromFormatted("<:paper_plane:1358007565614710785>")
+                                                                    )
+                                                                    .asDisabled()
+                                                    )
+                                                    .queue();
+                                        } catch (IOException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    }
+                            )
+                    );
+                    event.reply(INVALID_MESSAGE(false)).queue();
                     closePost(thread, "invalid");
                 } else {
                     event.reply(":x: **This is not your support thread or you don't have permission to do that**").setEphemeral(true).queue();

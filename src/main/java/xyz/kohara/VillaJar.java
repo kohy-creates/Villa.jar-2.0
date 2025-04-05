@@ -16,6 +16,7 @@ import xyz.kohara.tags.MessageListener;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class VillaJar {
@@ -26,7 +27,7 @@ public class VillaJar {
     public static JDA BOT;
     public static final String BOT_NAME = Config.getOption("bot_name");
     public static Guild BASEMENT;
-    public static Role STAFF_ROLE;
+    public static Role STAFF_ROLE, DEV_ROLE;
 
     public static void main(String[] args) throws Exception {
 
@@ -41,14 +42,18 @@ public class VillaJar {
 
         BASEMENT = BOT.getGuildById(Config.getOption("server_id"));
         STAFF_ROLE = BOT.getRoleById(Config.getOption("staff_role_id"));
+        DEV_ROLE = BOT.getRoleById(Config.getOption("dev_role_id"));
 
-        BOT.addEventListener(new MessageListener());
-        BOT.addEventListener(new ServerCommand());
-        BOT.addEventListener(new TagListCommand());
-        BOT.addEventListener(new AvatarCommand());
-        BOT.addEventListener(new LogUploader());
-        BOT.addEventListener(new AutoReact());
-        BOT.addEventListener(new ForumManager());
+        List<Object> listeners = List.of(
+                new MessageListener(),
+                new ServerCommand(),
+                new TagListCommand(),
+                new AvatarCommand(),
+                new LogUploader(),
+                new AutoReact(),
+                new ForumManager()
+        );
+        listeners.forEach(BOT::addEventListener);
 
         VillaJar.BASEMENT.updateCommands().addCommands(SlashCommands.COMMANDS).queue();
         ForumManager.scheduleReminderCheck();
@@ -64,6 +69,9 @@ public class VillaJar {
 
     public static boolean isStaff(Member member) {
         return member.getRoles().contains(STAFF_ROLE);
+    }
+    public static boolean isDev(Member member) {
+        return member.getRoles().contains(DEV_ROLE);
     }
 
     public static String toSmallUnicode(String s) {
