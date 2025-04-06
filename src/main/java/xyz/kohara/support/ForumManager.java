@@ -20,7 +20,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import xyz.kohara.Config;
-import xyz.kohara.VillaJar;
+import xyz.kohara.Aroki;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 public class ForumManager extends ListenerAdapter {
 
-    private static final ForumChannel SUPPORT_CHANNEL = VillaJar.getServer().getForumChannelById(Config.getOption("support_channel"));
+    private static final ForumChannel SUPPORT_CHANNEL = Aroki.getServer().getForumChannelById(Config.getOption("support_channel"));
 
     private static class Tag {
         public static final Long OPEN;
@@ -55,7 +55,7 @@ public class ForumManager extends ListenerAdapter {
     }
 
     private static boolean hasThreadManagementPerms(Member member) {
-        return (VillaJar.isDev(member) || VillaJar.isStaff(member));
+        return (Aroki.isDev(member) || Aroki.isStaff(member));
     }
 
     private static String REMINDER_MESSAGE(String member, boolean addReminder) throws IOException {
@@ -75,8 +75,8 @@ public class ForumManager extends ListenerAdapter {
     private static EmbedBuilder supportEmbed(Member member) throws IOException {
         EmbedBuilder embed = new EmbedBuilder();
         String iconUrl;
-        iconUrl = (VillaJar.getServer().getIcon() != null) ? VillaJar.getServer().getIcon().getUrl() : null;
-        embed.setAuthor(VillaJar.getServer().getName(), null, iconUrl);
+        iconUrl = (Aroki.getServer().getIcon() != null) ? Aroki.getServer().getIcon().getUrl() : null;
+        embed.setAuthor(Aroki.getServer().getName(), null, iconUrl);
 
         String content = Files.readString(Paths.get("data/forum/embed.md"));
 
@@ -208,7 +208,7 @@ public class ForumManager extends ListenerAdapter {
         if (event.getUser().isBot()) return;
         try {
             for (String id : ForumData.findThreads(Objects.requireNonNull(event.getMember()))) {
-                ThreadChannel thread = VillaJar.getServer().getChannelById(ThreadChannel.class, id);
+                ThreadChannel thread = Aroki.getServer().getChannelById(ThreadChannel.class, id);
                 assert thread != null;
                 closePost(thread, "invalid");
             }
@@ -236,7 +236,7 @@ public class ForumManager extends ListenerAdapter {
                     event.reply(":white_check_mark:").queue();
                     closePost(thread, "resolved");
                 } else if (action.equals("invalid") && staff) {
-                    VillaJar.getBot().retrieveUserById(op).queue(
+                    Aroki.getBot().retrieveUserById(op).queue(
                             user -> user.openPrivateChannel().queue(
                                     privateChannel -> {
                                         try {
@@ -248,7 +248,7 @@ public class ForumManager extends ListenerAdapter {
                                                             Button.of(
                                                                             ButtonStyle.PRIMARY,
                                                                             "sent_from",
-                                                                            "Sent from " + VillaJar.getServer().getName(), Emoji.fromFormatted("<:paper_plane:1358007565614710785>")
+                                                                            "Sent from " + Aroki.getServer().getName(), Emoji.fromFormatted("<:paper_plane:1358007565614710785>")
                                                                     )
                                                                     .asDisabled()
                                                     )
@@ -280,7 +280,7 @@ public class ForumManager extends ListenerAdapter {
                     threads = ForumData.getAllThreads();
                     for (String entry : threads) {
                         long lastReminded;
-                        ThreadChannel thread = Objects.requireNonNull(VillaJar.getServer().getThreadChannelById(entry));
+                        ThreadChannel thread = Objects.requireNonNull(Aroki.getServer().getThreadChannelById(entry));
                         List<Long> tags = new ArrayList<>(thread.getAppliedTags()
                                 .stream()
                                 .map(ForumTag::getIdLong)

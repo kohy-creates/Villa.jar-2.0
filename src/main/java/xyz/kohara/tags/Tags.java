@@ -1,13 +1,9 @@
 package xyz.kohara.tags;
 
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import okio.Path;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
-import xyz.kohara.VillaJar;
 
 import java.io.BufferedReader;
 import java.io.File;

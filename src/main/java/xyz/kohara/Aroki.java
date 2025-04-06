@@ -11,6 +11,7 @@ import xyz.kohara.autoreact.AutoReact;
 import xyz.kohara.commands.AvatarCommand;
 import xyz.kohara.commands.ServerCommand;
 import xyz.kohara.commands.TagListCommand;
+import xyz.kohara.music.MusicPlayer;
 import xyz.kohara.support.ForumManager;
 import xyz.kohara.tags.MessageListener;
 
@@ -18,8 +19,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class VillaJar {
+public class Aroki {
 
     private static final String token = Config.getOption("token");
     private static final GatewayIntent[] intents = {GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS};
@@ -51,18 +54,18 @@ public class VillaJar {
                 new AvatarCommand(),
                 new LogUploader(),
                 new AutoReact(),
-                new ForumManager()
+                new ForumManager(),
+                new MusicPlayer()
         );
         listeners.forEach(BOT::addEventListener);
 
-        VillaJar.BASEMENT.updateCommands().addCommands(SlashCommands.COMMANDS).queue();
+        Aroki.BASEMENT.updateCommands().addCommands(SlashCommands.COMMANDS).queue();
         ForumManager.scheduleReminderCheck();
     }
 
     public static Guild getServer() {
         return BASEMENT;
     }
-
     public static JDA getBot() {
         return BOT;
     }
@@ -85,5 +88,9 @@ public class VillaJar {
             result.append(map.getOrDefault(c, c));
         }
         return result.toString();
+    }
+
+    public static void log(Object CLASS, String text, Level level) {
+        Logger.getLogger(CLASS.getClass().getName()).log(level, text);
     }
 }

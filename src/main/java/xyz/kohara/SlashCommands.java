@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import xyz.kohara.commands.ServerCommand;
+import xyz.kohara.music.MusicSlashCommands;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -26,21 +27,23 @@ public class SlashCommands {
                 .addOptions(serverOption,
                         new OptionData(OptionType.BOOLEAN, "public", SEND_PUBLICLY_TIP, false)));
 
-        COMMANDS.add(Commands.slash("tags","List all registered tags")
+        COMMANDS.add(Commands.slash("tags", "List all registered tags")
                 .addOption(OptionType.BOOLEAN, "public", SEND_PUBLICLY_TIP, false)
         );
 
-        COMMANDS.add(Commands.slash("avatar","Returns the avatar (profile picture) of the chosen user")
+        COMMANDS.add(Commands.slash("avatar", "Returns the avatar (profile picture) of the chosen user")
                 .addOption(OptionType.USER, "user", "User", true)
                 .addOption(OptionType.BOOLEAN, "public", SEND_PUBLICLY_TIP, false)
         );
 
-        COMMANDS.add(Commands.slash("close","Closes the support thread")
+        COMMANDS.add(Commands.slash("close", "Closes the support thread")
                 .addOptions(
                         new OptionData(OptionType.STRING, "action", "Resolve or invalidate", false)
-                                .addChoice("Resolve","resolve")
-                                .addChoice("Invalidate","invalid")
+                                .addChoice("Resolve", "resolve")
+                                .addChoice("Invalidate", "invalid")
                 )
         );
+
+        COMMANDS.addAll(MusicSlashCommands.MUSIC_COMMANDS);
     }
 }

@@ -1,9 +1,10 @@
 plugins {
     id("java")
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 group = "xyz.kohara"
-version = "1.0-SNAPSHOT"
+version = ""
 
 repositories {
     mavenCentral()
@@ -29,4 +30,10 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "xyz.kohara.Aroki"
+    }
 }
