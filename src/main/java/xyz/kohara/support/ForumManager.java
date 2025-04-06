@@ -106,6 +106,7 @@ public class ForumManager extends ListenerAdapter {
             case "resolved" -> currentTagIds.add(Tag.RESOLVED);
         }
         currentTagIds.remove(Tag.OPEN);
+        currentTagIds.remove(Tag.TO_DO);
 
         ArrayList<ForumTagSnowflake> snowflakes = new ArrayList<>();
         for (Long id : currentTagIds) {

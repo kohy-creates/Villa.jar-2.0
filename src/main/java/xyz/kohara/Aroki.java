@@ -41,7 +41,7 @@ public class Aroki {
                 .build();
 
         BOT.awaitReady();
-        System.out.println("Bot " + BOT_NAME + " is online!");
+        log(Aroki.class.getName(), "Bot " + BOT_NAME + " has loaded!", Level.INFO);
 
         BASEMENT = BOT.getGuildById(Config.getOption("server_id"));
         STAFF_ROLE = BOT.getRoleById(Config.getOption("staff_role_id"));
@@ -90,7 +90,7 @@ public class Aroki {
         return result.toString();
     }
 
-    public static void log(Object CLASS, String text, Level level) {
-        Logger.getLogger(CLASS.getClass().getName()).log(level, text);
+    public static void log(String CLASS, String text, Level level) {
+        Logger.getLogger(CLASS).log(level, text);
     }
 }

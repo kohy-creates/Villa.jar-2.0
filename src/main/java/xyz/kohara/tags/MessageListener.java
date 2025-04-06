@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
+import xyz.kohara.Config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +23,7 @@ public class MessageListener extends ListenerAdapter {
     private static final Map<Member, String> tagMessagesTemp = new HashMap<>();
     private static final Map<String, String> tagValuesTemp = new HashMap<>();
 
-    private static final String PREFIX = "!!";
+    private static final String PREFIX = Config.getOption("tag_prefix");
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {

@@ -6,6 +6,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import xyz.kohara.Aroki;
 
+import javax.sound.midi.Track;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -29,7 +30,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public void queue(AudioTrack track) {
         if (!PLAYER.startTrack(track, true)) {
             if (!QUEUE.offer(track)) {
-                Aroki.log(this.getClass(), "Failed to add track to the queue!", Level.SEVERE);
+                Aroki.log(TrackScheduler.class.getName(), "Failed to add track to the queue!", Level.SEVERE);
             };
         }
     }
