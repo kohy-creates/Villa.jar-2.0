@@ -7,7 +7,9 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
+import xyz.kohara.Aroki;
 import xyz.kohara.Config;
 
 import java.util.HashMap;
@@ -24,6 +26,25 @@ public class MessageListener extends ListenerAdapter {
     private static final Map<String, String> tagValuesTemp = new HashMap<>();
 
     private static final String PREFIX = Config.getOption("tag_prefix");
+
+    private static final double REQUIRED_SIMILARITY = 0.75;
+
+    private static String TAGS_COMMAND;
+    private static String REPLY_INVALID_TAG;
+    static {
+        Aroki.getServer().retrieveCommands().queue(
+                commands -> {
+                    for (Command command : commands) {
+                        if (command.getName().equals("tags")) {
+                            TAGS_COMMAND = "</tags:" + command.getId() + ">";
+                             REPLY_INVALID_TAG = ":x: **Tag not found.**\n> You can do " + TAGS_COMMAND + " for a full list of tags";
+                            break;
+                        }
+                    }
+                }
+        );
+    }
+
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
@@ -50,8 +71,8 @@ public class MessageListener extends ListenerAdapter {
                         bestMatch = key;
                     }
                 }
-                wasSimilar = (highestSimilarity > 0.5);
-                reply = (wasSimilar) ? ":x: **Unknown tag!** Did you mean *`" + bestMatch + "`*? (" + (int) (highestSimilarity * 100) + "%)" : ":x: **Tag not found**";
+                wasSimilar = (highestSimilarity > REQUIRED_SIMILARITY);
+                reply = (wasSimilar) ? ":x: **Unknown tag!** Did you mean *`" + bestMatch + "`*? (" + (int) (highestSimilarity * 100) + "%)" : REPLY_INVALID_TAG;
 
             }
             Message message = channel.sendMessage(reply).complete();
@@ -69,7 +90,7 @@ public class MessageListener extends ListenerAdapter {
                     message.removeReaction(Emoji.fromFormatted("✅")).queue();
                     message.removeReaction(Emoji.fromFormatted("❌")).queue();
 
-                    message.editMessage(":x: **Tag not found**").queue();
+                    message.editMessage(REPLY_INVALID_TAG).queue();
 
                     tagValuesTemp.remove(message.getId());
                     tagMessagesTemp.remove(event.getMember());
@@ -83,6 +104,7 @@ public class MessageListener extends ListenerAdapter {
         if (Objects.requireNonNull(event.getUser()).isBot()) return;
         String id = event.getMessageId();
         Member member = event.getMember();
+        if (!tagMessagesTemp.containsValue(id)) return;
         if (!tagMessagesTemp.containsKey(member)) {
             event.getReaction().removeReaction(event.getUser()).queue();
             return;
@@ -91,7 +113,7 @@ public class MessageListener extends ListenerAdapter {
         if (eventId == null) return;
         if (eventId.equals(id)) {
             event.getReaction().removeReaction(event.getUser()).queue();
-            String newContet = (event.getReaction().getEmoji().equals(Emoji.fromFormatted("✅"))) ? tagValuesTemp.get(id) : ":x: **Tag not found**";
+            String newContet = (event.getReaction().getEmoji().equals(Emoji.fromFormatted("✅"))) ? tagValuesTemp.get(id) : REPLY_INVALID_TAG;
 
             event.getChannel().retrieveMessageById(id).queue(
                     message -> {

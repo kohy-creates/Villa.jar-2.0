@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import xyz.kohara.autoreact.AutoReact;
 import xyz.kohara.commands.AvatarCommand;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,6 +91,7 @@ public class Aroki {
         }
         return result.toString();
     }
+
 
     public static void log(String CLASS, String text, Level level) {
         Logger.getLogger(CLASS).log(level, text);

@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
@@ -38,11 +39,13 @@ public class ForumManager extends ListenerAdapter {
         public static final Long INVALID;
         public static final Long TO_DO;
 
+
         static {
             OPEN = parseConfig("open_tag_id");
             RESOLVED = parseConfig("resolved_tag_id");
             INVALID = parseConfig("invalid_tag_id");
             TO_DO = parseConfig("to_do_tag_id");
+
         }
 
         private static Long parseConfig(String key) {
@@ -54,6 +57,21 @@ public class ForumManager extends ListenerAdapter {
         }
     }
 
+    private static String CLOSE_COMMAND;
+
+    static {
+        Aroki.getServer().retrieveCommands().queue(
+                commands -> {
+                    for (Command command : commands) {
+                        if (command.getName().equals("close")) {
+                            CLOSE_COMMAND = command.getAsMention();
+                            break;
+                        }
+                    }
+                }
+        );
+    }
+
     private static boolean hasThreadManagementPerms(Member member) {
         return (Aroki.isDev(member) || Aroki.isStaff(member));
     }
@@ -61,6 +79,7 @@ public class ForumManager extends ListenerAdapter {
     private static String REMINDER_MESSAGE(String member, boolean addReminder) throws IOException {
         String text = Files.readString(Paths.get("data/forum/reminder_message.md")).trim();
         text = text.replace("{MEMBER}", "<@" + member + ">");
+        text = text.replace("{CLOSE}", CLOSE_COMMAND);
 
         int splitIndex = text.lastIndexOf(">");
         String[] parts = new String[]{text.substring(0, splitIndex - 1), text.substring(splitIndex - 1)};
@@ -79,10 +98,11 @@ public class ForumManager extends ListenerAdapter {
         embed.setAuthor(Aroki.getServer().getName(), null, iconUrl);
 
         String content = Files.readString(Paths.get("data/forum/embed.md"));
+        content = content.replace("{CLOSE}", CLOSE_COMMAND);
+        content = content.replace("{MEMBER}", member.getAsMention());
 
         int firstSectionIndex = content.indexOf("###");
         String description = content.substring(0, firstSectionIndex).trim();
-        description = description.replace("{MEMBER}", member.getAsMention());
         embed.setDescription(description);
 
         Pattern sectionPattern = Pattern.compile("(?=^### )", Pattern.MULTILINE);

@@ -9,4 +9,4 @@ Please be patient, we will answer your question when we are able to.
 :four: Tag your post *(if you haven't done that yet)*
 
 ### After your questions are answered...
-**Make sure to close your thread by either sending :white_check_mark: or by doing </close:0>.**
+**Make sure to close your thread by either sending :white_check_mark: or by doing {CLOSE}.**
