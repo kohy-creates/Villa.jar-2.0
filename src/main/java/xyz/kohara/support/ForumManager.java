@@ -228,7 +228,9 @@ public class ForumManager extends ListenerAdapter {
     public void onGuildMemberRemove(GuildMemberRemoveEvent event) {
         if (event.getUser().isBot()) return;
         try {
-            for (String id : ForumData.findThreads(Objects.requireNonNull(event.getMember()))) {
+            assert event.getMember() != null;
+            List<String> threadList = ForumData.findThreads(event.getMember());
+            for (String id : threadList) {
                 ThreadChannel thread = Aroki.getServer().getChannelById(ThreadChannel.class, id);
                 assert thread != null;
                 closePost(thread, "invalid");

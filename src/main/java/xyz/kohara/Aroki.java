@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,6 +62,8 @@ public class Aroki {
 
         Aroki.BASEMENT.updateCommands().addCommands(SlashCommands.COMMANDS).queue();
         ForumManager.scheduleReminderCheck();
+
+        log(Aroki.class.getName(), "Successfully finished startup", Level.INFO);
     }
 
     public static Guild getServer() {
@@ -91,7 +92,6 @@ public class Aroki {
         }
         return result.toString();
     }
-
 
     public static void log(String CLASS, String text, Level level) {
         Logger.getLogger(CLASS).log(level, text);
