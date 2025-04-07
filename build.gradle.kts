@@ -37,3 +37,8 @@ tasks.jar {
         attributes["Main-Class"] = "xyz.kohara.Aroki"
     }
 }
+
+tasks.shadowJar {
+    archiveBaseName.set("Aroki")
+    archiveClassifier.set("")
+}
