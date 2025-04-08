@@ -2,7 +2,6 @@ package xyz.kohara;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -12,6 +11,7 @@ import xyz.kohara.commands.AvatarCommand;
 import xyz.kohara.commands.ServerCommand;
 import xyz.kohara.commands.TagListCommand;
 import xyz.kohara.music.MusicPlayer;
+import xyz.kohara.status.BotActivity;
 import xyz.kohara.support.ForumManager;
 import xyz.kohara.tags.MessageListener;
 
@@ -37,7 +37,6 @@ public class Aroki {
         BOT = JDABuilder
                 .createDefault(token)
                 .enableIntents(Arrays.asList(intents))
-                .setActivity(Activity.customStatus("owo"))
                 .build();
 
         BOT.awaitReady();
@@ -61,6 +60,7 @@ public class Aroki {
 
         Aroki.BASEMENT.updateCommands().addCommands(SlashCommands.COMMANDS).queue();
         ForumManager.scheduleReminderCheck();
+        BotActivity.schedule();
 
         log(Aroki.class.getName(), "Bot " + BOT_NAME + " has successfully finished startup", Level.INFO);
     }
