@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import xyz.kohara.autoreact.AutoReact;
 import xyz.kohara.commands.AvatarCommand;
@@ -42,7 +41,6 @@ public class Aroki {
                 .build();
 
         BOT.awaitReady();
-        log(Aroki.class.getName(), "Bot " + BOT_NAME + " has loaded!", Level.INFO);
 
         BASEMENT = BOT.getGuildById(Config.getOption("server_id"));
         STAFF_ROLE = BOT.getRoleById(Config.getOption("staff_role_id"));
@@ -63,7 +61,7 @@ public class Aroki {
         Aroki.BASEMENT.updateCommands().addCommands(SlashCommands.COMMANDS).queue();
         ForumManager.scheduleReminderCheck();
 
-        log(Aroki.class.getName(), "Successfully finished startup", Level.INFO);
+        log(Aroki.class.getName(), "Bot " + BOT_NAME + " has successfully finished startup", Level.INFO);
     }
 
     public static Guild getServer() {
