@@ -54,7 +54,8 @@ public class Aroki {
                 new LogUploader(),
                 new AutoReact(),
                 new ForumManager(),
-                new MusicPlayer()
+                new MusicPlayer(),
+                new MCBugs()
         );
         listeners.forEach(BOT::addEventListener);
 
