@@ -30,7 +30,7 @@ public class MCBugs extends ListenerAdapter {
                 event.getChannel()
                         .sendMessage("")
                         .addActionRow(
-                                Button.link("https://bugs.mojang.com/browse/" + extracted[0] + "/issues/" + group, group).withEmoji(Emoji.fromFormatted("🐛"))
+                                Button.link("https://bugs.mojang.com/browse/" + extracted[0] + "/issues/" + group, group).withEmoji(Emoji.fromFormatted("<:mojira:1359506375842988185>"))
                         )
                         .setMessageReference(event.getMessage())
                         .mentionRepliedUser(false)

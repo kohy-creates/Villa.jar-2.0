@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 public class ForumManager extends ListenerAdapter {
 
     private static final ForumChannel SUPPORT_CHANNEL = Aroki.getServer().getForumChannelById(Config.getOption("support_channel"));
+    private static final int INTERVAL_MINUTES = 15;
 
     private static class Tag {
         public static final Long OPEN;
@@ -322,6 +323,6 @@ public class ForumManager extends ListenerAdapter {
                 }
 
             }
-        }, 100, 15 * 60 * 1000);
+        }, 100, INTERVAL_MINUTES * 60 * 1000);
     }
 }

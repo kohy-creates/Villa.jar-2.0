@@ -1,8 +1,8 @@
 package xyz.kohara.status;
 
 import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.managers.Presence;
 import xyz.kohara.Aroki;
 
 import java.io.IOException;
@@ -13,8 +13,15 @@ import java.util.*;
 public class BotActivity {
 
     private static final List<Activity> STATUS_LIST = new ArrayList<>();
+    private static final int INTERVAL_MINUTES = 60;
 
-    static {
+    private static String replacePlaceholders(String string) {
+        return string
+                .replace("{MEMBER_COUNT}", ((Integer) Aroki.getServer().getMemberCount()).toString())
+                .replace("{GUILD}", Aroki.getServer().getName());
+    }
+
+    public static void schedule() {
         Gson gson = new Gson();
         try {
             String content = String.join("\n", Files.readAllLines(Paths.get("data/status.json")));
@@ -39,23 +46,25 @@ public class BotActivity {
                         case "competing" -> type = Activity.ActivityType.COMPETING;
                     }
                     assert type != null;
-                    Activity status = (!streaming) ? Activity.of(type, entry) : Activity.of(type, entry, statusData.getStreamingURL());
+                    Activity status = Activity.of(type, replacePlaceholders(entry), (streaming) ? statusData.getStreamingURL() : null);
                     STATUS_LIST.add(status);
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
 
-    public static void schedule() {
         Timer timer = new Timer(true);
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                Activity randomActivity = STATUS_LIST.get(new Random().nextInt(STATUS_LIST.size()));
+                Activity randomActivity;
+                Activity current = Aroki.getBot().getPresence().getActivity();
+                do {
+                    randomActivity = STATUS_LIST.get(new Random().nextInt(STATUS_LIST.size()));
+                } while (randomActivity == current);
                 Aroki.getBot().getPresence().setActivity(randomActivity);
             }
-        }, 0, 10 * 1000);
+        }, 0, 60 * 1000 * INTERVAL_MINUTES);
     }
 }

@@ -2,16 +2,18 @@ package xyz.kohara.autoreact;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.vdurmont.emoji.EmojiParser;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import xyz.kohara.Aroki;
 
 import java.io.FileReader;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AutoReact extends ListenerAdapter {
@@ -41,10 +43,21 @@ public class AutoReact extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
-        String messageContent = event.getMessage().getContentRaw();
+        String content = event.getMessage().getContentRaw().toLowerCase();
+        if (content.contains(Aroki.getServer().getSelfMember().getAsMention())) {
+            event.getMessage().addReaction(Emoji.fromFormatted("👋")).queue();
+        }
         for (String key : AUTO_REACTIONS.keySet()) {
-            if ((key.indexOf("regex:") == 0 && Pattern.compile(key.substring(6)).matcher(messageContent).matches()) || messageContent.contains(key)) {
+            if ((key.indexOf("regex:") == 0 && Pattern.compile(key.substring("regex:".length())).matcher(content).find()) || content.contains(key)) {
                 for (String emoji : AUTO_REACTIONS.get(key)) {
+                    if (emoji.indexOf("author|") == 0) {
+                        System.out.println(emoji);
+                        Matcher matcher = Pattern.compile("^author\\|(\\d+):(.+)$").matcher(emoji);
+                        if (!matcher.matches()) continue;
+                        String author = matcher.group(1);
+                        if (!Objects.equals(author, event.getAuthor().getId())) continue;
+                        emoji = matcher.group(2);
+                    }
                     Emoji reaction = Emoji.fromFormatted(emoji);
                     event.getMessage().addReaction(reaction).queue();
                 }

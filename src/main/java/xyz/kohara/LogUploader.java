@@ -119,7 +119,7 @@ public class LogUploader extends ListenerAdapter {
                 ArrayList<Button> buttons = new ArrayList<>();
                 List<String> data = uploads.get(key);
                 String url = data.getFirst();
-                buttons.add(Button.link(url, key).withEmoji(Emoji.fromUnicode("🔗")));
+                buttons.add(Button.link(url, key).withEmoji(Emoji.fromFormatted("<:mclogs:1359506468344299530>")));
                 /*
                     If it isn't a crash report or a log, size of the list will be 2 (look at 'uploadToMcLogs')
                     We don't add the 2nd button with quick info if it's a random ass txt file.
@@ -131,13 +131,13 @@ public class LogUploader extends ListenerAdapter {
                     if (isDiscontinued(version)) {
                         buttons.add(
                                 Button.danger(key, label)
-                                        .withEmoji(Emoji.fromUnicode("📜"))
+                                        .withEmoji(Emoji.fromFormatted("📜"))
                                         .asDisabled()
                         );
                     } else {
                         buttons.add(
                                 Button.primary(key, label)
-                                        .withEmoji(Emoji.fromUnicode("📜"))
+                                        .withEmoji(Emoji.fromFormatted("📜"))
                                         .asDisabled()
                         );
                     }
@@ -231,7 +231,7 @@ public class LogUploader extends ListenerAdapter {
         for (String discontinuedPattern : DISCONTINUED_VERSIONS) {
             String regex = discontinuedPattern.replace("*", ".*");
             Pattern pattern = Pattern.compile(regex);
-            if (pattern.matcher(version).matches()) {
+            if (pattern.matcher(version).find()) {
                 return true;
             }
         }

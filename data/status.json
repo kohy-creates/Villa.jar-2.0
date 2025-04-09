@@ -1,21 +1,20 @@
 {
-  "listening": [
-    "test",
-    "test2"
-  ],
-  "playing": [
-    "test3",
-    "test4",
-    "test5"
-  ],
-  "watching": [
-    "souls"
-  ],
-  "streaming": [],
-  "competing": [],
-  "streaming_url": "https://twitch.tv/kohy_creates",
-  "normal": [
-    "0",
-    "owo"
-  ]
+	"listening": [
+		"#support"
+	],
+	"playing": [
+		"with things in the Basement"
+	],
+	"watching": [
+		"{MEMBER_COUNT} souls",
+		"{GUILD}"
+	],
+	"streaming": [],
+	"competing": [],
+	"streaming_url": "https://twitch.tv/kohy_creates",
+	"normal": [
+		"oωo",
+		"o(≧▽≦)o",
+		":3"
+	]
 }

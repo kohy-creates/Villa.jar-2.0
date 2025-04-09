@@ -1,37 +1,59 @@
 {
-  "1": {
-    "phrases": [
-      "test1",
-      "test2"
-    ],
-    "reactions": [
-      "📜",
-      "✅"
-    ]
-  },
-  "2": {
-    "phrases": [
-      "test3",
-      "test6"
-    ],
-    "reactions": [
-      "❌"
-    ]
-  },
-  "3": {
-    "phrases": [
-      "fnaf"
-    ],
-    "reactions": [
-      "<:fnafworld:1357005436716453978>"
-    ]
-  },
-  "4": {
-    "phrases": [
-      "regex:^(?i)(?=.*\\bvilla\\.jar\\b)(?=.*\\bhello\\b).*$"
-    ],
-    "reactions": [
-      "👋"
-    ]
-  }
+	"1": {
+		"phrases": [
+			"foka"
+		],
+		"reactions": [
+			"<:hooraaaayyy:925141494854201354>"
+		]
+	},
+	"2": {
+		"phrases": [
+			"paper"
+		],
+		"reactions": [
+			"<:burn_paper:930467319350706248>"
+		]
+	},
+	"3": {
+		"phrases": [
+			"purpur"
+		],
+		"reactions": [
+			"<:purpur:1263829685918371851>"
+		]
+	},
+	"4": {
+		"phrases": [
+			"optifine"
+		],
+		"reactions": [
+			"<:opticrime:1245697265704767539>"
+		]
+	},
+	"5": {
+		"phrases": [
+			"regex:(?=.*\bstellarity\b)(?=.*1\\.20).*"
+		],
+		"reactions": [
+			"<:NO:1128658239723159602>"
+		]
+	},
+	"7": {
+		"phrases": [
+			"regex:(?:\\btrans\\b)|(?:bl[a|å]haj)|\uD83C\uDFF3\uFE0F\u200D⚧\uFE0F"
+		],
+		"reactions": [
+			"🏳️‍⚧️"
+		]
+	},
+	"8": {
+		"phrases": [
+			"regex:(?:\\bgay\\b)|(?:\\bhomosexual\\b)|\uD83C\uDFF3\uFE0F\u200D\uD83C\uDF08"
+		],
+		"reactions": [
+			"<:gay_flag:1359498243095920881> ",
+			"author|619922683408154634:<:kohara:1359498220606328979>"
+		]
+	}
 }
