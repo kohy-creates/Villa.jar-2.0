@@ -2,7 +2,6 @@ package xyz.kohara.status;
 
 import com.google.gson.Gson;
 import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.managers.Presence;
 import xyz.kohara.Aroki;
 
 import java.io.IOException;

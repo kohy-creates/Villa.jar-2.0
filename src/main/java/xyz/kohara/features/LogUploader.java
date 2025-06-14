@@ -2,7 +2,7 @@
 // Thankss uωu <3
 //
 // Edited by kohy
-package xyz.kohara;
+package xyz.kohara.features;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,4 +1,4 @@
-package xyz.kohara.music;
+package xyz.kohara.features.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
@@ -6,7 +6,6 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import xyz.kohara.Aroki;
 
-import javax.sound.midi.Track;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;

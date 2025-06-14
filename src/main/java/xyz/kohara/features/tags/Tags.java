@@ -1,4 +1,4 @@
-package xyz.kohara.tags;
+package xyz.kohara.features.tags;
 
 import okio.Path;
 import org.yaml.snakeyaml.LoaderOptions;

@@ -1,4 +1,4 @@
-package xyz.kohara.music;
+package xyz.kohara.features.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;

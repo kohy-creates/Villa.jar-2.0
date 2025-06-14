@@ -1,4 +1,4 @@
-package xyz.kohara.autoreact;
+package xyz.kohara.features.autoreact;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

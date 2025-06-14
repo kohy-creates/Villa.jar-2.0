@@ -1,4 +1,4 @@
-package xyz.kohara.support;
+package xyz.kohara.features.support;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;

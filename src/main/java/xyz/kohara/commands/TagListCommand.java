@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
-import xyz.kohara.tags.Tags;
+import xyz.kohara.features.tags.Tags;
 
 import java.util.ArrayList;
 import java.util.Map;

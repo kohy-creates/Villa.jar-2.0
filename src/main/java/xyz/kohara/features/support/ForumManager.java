@@ -1,4 +1,4 @@
-package xyz.kohara.support;
+package xyz.kohara.features.support;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;

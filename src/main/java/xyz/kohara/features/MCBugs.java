@@ -1,4 +1,4 @@
-package xyz.kohara;
+package xyz.kohara.features;
 
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
