@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -86,7 +87,7 @@ public class ForumData {
 
     }
 
-    public static List<String> findThreads(Member op) throws IOException {
+    public static List<String> findThreads(User op) throws IOException {
         String id = op.getId();
         List<String> openThreads = new ArrayList<>();
 
