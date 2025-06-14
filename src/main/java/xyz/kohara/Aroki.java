@@ -54,7 +54,8 @@ public class Aroki {
                 new AutoReact(),
                 new ForumManager(),
                 new MusicPlayer(),
-                new MCBugs()
+                new MCBugs(),
+                new AutoRole()
         );
         listeners.forEach(BOT::addEventListener);
 

@@ -96,8 +96,8 @@ public class ForumData {
             String key = entry.getKey();
             JsonObject data = (JsonObject) entry.getValue();
 
-            if (data.has("op") && data.get("op").getAsString().equals(id)) {
-                openThreads.add(key);
+            if (data.has("op")) {
+                if (data.get("op").getAsString().equals(id)) openThreads.add(key);
             }
         }
         return openThreads;
