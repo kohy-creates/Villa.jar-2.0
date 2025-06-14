@@ -6,10 +6,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import xyz.kohara.features.AutoRole;
-import xyz.kohara.features.LogUploader;
-import xyz.kohara.features.MCBugs;
-import xyz.kohara.features.SlashCommands;
+import xyz.kohara.features.*;
 import xyz.kohara.features.autoreact.AutoReact;
 import xyz.kohara.commands.AvatarCommand;
 import xyz.kohara.commands.ServerCommand;
@@ -59,7 +56,8 @@ public class Aroki {
                 new ForumManager(),
                 new MusicPlayer(),
                 new MCBugs(),
-                new AutoRole()
+                new AutoRole(),
+                new Quote()
         );
         listeners.forEach(BOT::addEventListener);
 
