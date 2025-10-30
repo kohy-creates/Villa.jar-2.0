@@ -302,7 +302,8 @@ public class ForumManager extends ListenerAdapter {
                     threads = ForumData.getAllThreads();
                     for (String entry : threads) {
                         long lastReminded;
-                        ThreadChannel thread = Objects.requireNonNull(Aroki.getServer().getThreadChannelById(entry));
+                        ThreadChannel thread = Aroki.getServer().getThreadChannelById(entry);
+                        if (thread == null) return;
                         List<Long> tags = new ArrayList<>(thread.getAppliedTags()
                                 .stream()
                                 .map(ForumTag::getIdLong)
