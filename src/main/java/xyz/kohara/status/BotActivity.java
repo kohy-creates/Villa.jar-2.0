@@ -26,7 +26,6 @@ public class BotActivity {
             String content = String.join("\n", Files.readAllLines(Paths.get("data/status.json")));
             StatusData statusData = gson.fromJson(content, StatusData.class);
             Map<String, List<String>> activityMap = statusData.getAllActivities();
-            System.out.println(activityMap);
             for (String key : activityMap.keySet()) {
                 List<String> text = activityMap.get(key);
                 for (String entry : text) {

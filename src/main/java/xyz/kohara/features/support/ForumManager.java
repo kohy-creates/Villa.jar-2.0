@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.forums.ForumTag;
 import net.dv8tion.jda.api.entities.channel.forums.ForumTagSnowflake;
+import net.dv8tion.jda.api.entities.channel.unions.GuildChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
@@ -23,9 +24,9 @@ import net.dv8tion.jda.api.managers.channel.concrete.ThreadChannelManager;
 import xyz.kohara.Config;
 import xyz.kohara.Aroki;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -33,6 +34,22 @@ public class ForumManager extends ListenerAdapter {
 
     private static final ForumChannel SUPPORT_CHANNEL = Aroki.getServer().getForumChannelById(Config.getOption("support_channel"));
     private static final int INTERVAL_MINUTES = 15;
+
+    private static final Map<String, String> replyCache = new HashMap<>();
+    static {
+        File dir = new File("data/forum/");
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            try {
+                for (File child : directoryListing) {
+                    String name = child.getName().split("\\.")[0];
+                    replyCache.put(name, Files.readString(child.toPath()).trim());
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 
     private static class Tag {
         public static final Long OPEN = parseConfig("open_tag_id");
@@ -68,8 +85,8 @@ public class ForumManager extends ListenerAdapter {
         return (Aroki.isDev(member) || Aroki.isStaff(member));
     }
 
-    private static String REMINDER_MESSAGE(String member, boolean addReminder) throws IOException {
-        String text = Files.readString(Paths.get("data/forum/reminder_message.md")).trim();
+    private static String REMINDER_MESSAGE(String member, boolean addReminder) {
+        String text = replyCache.get("reminder_message");
         text = text.replace("{MEMBER}", "<@" + member + ">");
         text = text.replace("{CLOSE}", CLOSE_COMMAND);
 
@@ -79,17 +96,21 @@ public class ForumManager extends ListenerAdapter {
 
     }
 
-    private static String INVALID_MESSAGE(boolean DM) throws IOException {
-        return Files.readString(Paths.get((DM) ? "data/forum/invalid_dm.md" : "data/forum/invalid.md")).trim();
+    private static String DUPLICATE_MESSAGE(boolean DM) {
+        return replyCache.get((DM) ? "duplicate_dm" : "duplicate");
     }
 
-    private static EmbedBuilder supportEmbed(Member member) throws IOException {
+    private static String INVALID_MESSAGE(boolean DM) {
+        return replyCache.get((DM) ? "invalid_dm" : "invalid");
+    }
+
+    private static EmbedBuilder supportEmbed(Member member) {
         EmbedBuilder embed = new EmbedBuilder();
         String iconUrl;
         iconUrl = (Aroki.getServer().getIcon() != null) ? Aroki.getServer().getIcon().getUrl() : null;
         embed.setAuthor(Aroki.getServer().getName(), null, iconUrl);
 
-        String content = Files.readString(Paths.get("data/forum/embed.md"));
+        String content = replyCache.get("embed");
         content = content.replace("{CLOSE}", CLOSE_COMMAND);
         content = content.replace("{MEMBER}", member.getAsMention());
 
@@ -252,28 +273,51 @@ public class ForumManager extends ListenerAdapter {
                     Aroki.getBot().retrieveUserById(op).queue(
                             user -> user.openPrivateChannel().queue(
                                     privateChannel -> {
-                                        try {
-                                            String text = INVALID_MESSAGE(true);
-                                            text = text.replace("{THREAD}", thread.getAsMention());
-                                            privateChannel
-                                                    .sendMessage(text)
-                                                    .setActionRow(
-                                                            Button.of(
-                                                                            ButtonStyle.PRIMARY,
-                                                                            "sent_from",
-                                                                            "Sent from " + Aroki.getServer().getName(), Emoji.fromFormatted("<:paper_plane:1358007565614710785>")
-                                                                    )
-                                                                    .asDisabled()
-                                                    )
-                                                    .queue();
-                                        } catch (IOException e) {
-                                            throw new RuntimeException(e);
-                                        }
+                                        String text = INVALID_MESSAGE(true);
+                                        text = text.replace("{THREAD}", thread.getAsMention());
+                                        privateChannel
+                                                .sendMessage(text)
+                                                .setActionRow(
+                                                        Button.of(
+                                                            ButtonStyle.PRIMARY,
+                                                            "sent_from", "Sent from " + Aroki.getServer().getName(), Emoji.fromFormatted("<:paper_plane:1358007565614710785>")
+                                                        ).asDisabled()
+                                                )
+                                                .queue();
                                     }
                             )
                     );
                     event.reply(INVALID_MESSAGE(false)).queue();
                     closePost(thread, "invalid");
+                } else if (action.equals("duplicate") && staff){
+                    OptionMapping od = event.getOption("duplicate_of");
+                    if (od == null) {
+                        event.reply(":x: **You need to set what thread this duplicates!**").setEphemeral(true).queue();
+                        return;
+                    }
+                    GuildChannelUnion ad = od.getAsChannel();
+                    Aroki.getBot().retrieveUserById(op).queue(
+                            user -> user.openPrivateChannel().queue(
+                                    privateChannel -> {
+                                        String text = DUPLICATE_MESSAGE(true)
+                                                .replace("{THREAD}", thread.getAsMention())
+                                                .replace("{DUPLICATE}", ad.getAsMention());
+                                        privateChannel
+                                                .sendMessage(text)
+                                                .setActionRow(
+                                                        Button.of(
+                                                                ButtonStyle.PRIMARY,
+                                                                "sent_from", "Sent from " + Aroki.getServer().getName(), Emoji.fromFormatted("<:paper_plane:1358007565614710785>")
+                                                        ).asDisabled()
+                                                )
+                                                .queue();
+                                    }
+                            )
+                    );
+                    String text = DUPLICATE_MESSAGE(false)
+                            .replace("{DUPLICATE}", ad.getAsMention());
+                    event.reply(text).queue();
+                    closePost(thread, "duplicate");
                 } else {
                     event.reply(":x: **This is not your support thread or you don't have permission to do that**").setEphemeral(true).queue();
                 }
@@ -295,6 +339,7 @@ public class ForumManager extends ListenerAdapter {
                         long lastReminded;
                         ThreadChannel thread = Aroki.getServer().getThreadChannelById(entry);
                         if (thread == null) {
+                            ForumData.removeEntry(entry);
                             continue;
                         };
                         List<Long> tags = new ArrayList<>(thread.getAppliedTags()

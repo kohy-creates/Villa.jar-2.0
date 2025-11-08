@@ -30,7 +30,8 @@ public class Config {
             "resolved_tag_id", "0000",
             "to_do_tag_id", "0000",
             "duplicate_tag_id", "0000",
-            "tag_prefix", "!"
+            "tag_prefix", "!",
+            "mortals_role", "0000"
     );
 
     static {

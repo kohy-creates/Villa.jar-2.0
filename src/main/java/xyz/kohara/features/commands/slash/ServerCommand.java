@@ -1,4 +1,4 @@
-package xyz.kohara.features.commands;
+package xyz.kohara.features.commands.slash;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

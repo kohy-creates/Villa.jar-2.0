@@ -1,4 +1,4 @@
-package xyz.kohara.features.commands;
+package xyz.kohara.features.commands.slash;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;

@@ -1,10 +1,10 @@
-package xyz.kohara.features;
+package xyz.kohara.features.commands;
 
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import xyz.kohara.features.commands.ServerCommand;
+import xyz.kohara.features.commands.slash.ServerCommand;
 import xyz.kohara.features.music.MusicSlashCommands;
 
 import java.util.ArrayList;
@@ -38,9 +38,11 @@ public class SlashCommands {
 
         COMMANDS.add(Commands.slash("close", "Closes the support thread")
                 .addOptions(
-                        new OptionData(OptionType.STRING, "action", "Resolve or invalidate", false)
+                        new OptionData(OptionType.STRING, "action", "Resolution type", false)
                                 .addChoice("Resolve", "resolve")
                                 .addChoice("Invalidate", "invalid")
+                                .addChoice("Duplicate", "duplicate"),
+                        new OptionData(OptionType.CHANNEL, "duplicate_of", "What thread does this duplicate? Only applies if resolution type is 'Duplicate'", false)
                 )
         );
 
