@@ -41,8 +41,11 @@ public class SlashCommands {
                         new OptionData(OptionType.STRING, "action", "Resolution type", false)
                                 .addChoice("Resolve", "resolve")
                                 .addChoice("Invalidate", "invalid")
-                                .addChoice("Duplicate", "duplicate"),
-                        new OptionData(OptionType.CHANNEL, "duplicate_of", "What thread does this duplicate? Only applies if resolution type is 'Duplicate'", false)
+                                .addChoice("Duplicate", "duplicate")
+                )
+                .addOptions(
+                        new OptionData(OptionType.CHANNEL, "duplicate_of", "What thread does this duplicate? Only applies if resolution type is 'Duplicate'", false),
+                        new OptionData(OptionType.STRING, "note", "Note on closing from staff. Can be empty", false)
                 )
         );
 

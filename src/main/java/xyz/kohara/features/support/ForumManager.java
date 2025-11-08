@@ -51,22 +51,6 @@ public class ForumManager extends ListenerAdapter {
         }
     }
 
-    private static class Tag {
-        public static final Long OPEN = parseConfig("open_tag_id");
-        public static final Long RESOLVED = parseConfig("resolved_tag_id");
-        public static final Long INVALID = parseConfig("invalid_tag_id");
-        public static final Long TO_DO = parseConfig("to_do_tag_id");
-        public static final Long DUPLICATE = parseConfig("duplicate_tag_id");
-
-        private static Long parseConfig(String key) {
-            String value = Config.getOption(key);
-            if (value == null) {
-                throw new RuntimeException("Config key '" + key + "' is missing or null!");
-            }
-            return Long.parseLong(value);
-        }
-    }
-
     private static String CLOSE_COMMAND;
     static {
         Aroki.getServer().retrieveCommands().queue(
@@ -93,7 +77,6 @@ public class ForumManager extends ListenerAdapter {
         int splitIndex = text.lastIndexOf(">");
         String[] parts = new String[]{text.substring(0, splitIndex - 1), text.substring(splitIndex - 1)};
         return (addReminder) ? parts[0] + "\n" + parts[1] : parts[0];
-
     }
 
     private static String DUPLICATE_MESSAGE(boolean DM) {
@@ -104,7 +87,7 @@ public class ForumManager extends ListenerAdapter {
         return replyCache.get((DM) ? "invalid_dm" : "invalid");
     }
 
-    private static EmbedBuilder supportEmbed(Member member) {
+    private static EmbedBuilder SUPPORT_EMBED(Member member) {
         EmbedBuilder embed = new EmbedBuilder();
         String iconUrl;
         iconUrl = (Aroki.getServer().getIcon() != null) ? Aroki.getServer().getIcon().getUrl() : null;
@@ -135,12 +118,12 @@ public class ForumManager extends ListenerAdapter {
                 .map(ForumTag::getIdLong)
                 .toList());
         switch (reason) {
-            case "duplicate" -> currentTagIds.add(Tag.DUPLICATE);
-            case "invalid" -> currentTagIds.add(Tag.INVALID);
-            case "resolved" -> currentTagIds.add(Tag.RESOLVED);
+            case "duplicate" -> currentTagIds.add(ForumTags.DUPLICATE.getId());
+            case "invalid" -> currentTagIds.add(ForumTags.INVALID.getId());
+            case "resolved" -> currentTagIds.add(ForumTags.RESOLVED.getId());
         }
-        currentTagIds.remove(Tag.OPEN);
-        currentTagIds.remove(Tag.TO_DO);
+        currentTagIds.remove(ForumTags.OPEN.getId());
+        currentTagIds.remove(ForumTags.TO_DO.getId());
 
         ArrayList<ForumTagSnowflake> snowflakes = new ArrayList<>();
         for (Long id : currentTagIds) {
@@ -196,7 +179,7 @@ public class ForumManager extends ListenerAdapter {
                     }
                 } else if (!ForumData.entryExists(id)) {
                     ForumData.addEntry(id, Objects.requireNonNull(event.getMember()).getId(), System.currentTimeMillis());
-                    channel.sendMessage("").addEmbeds(supportEmbed(event.getMember()).build()).queue(
+                    channel.sendMessage("").addEmbeds(SUPPORT_EMBED(event.getMember()).build()).queue(
                             message -> message.pin().queue(
                                     success -> channel.getHistory().retrievePast(1).queue(messages -> {
                                         Message lastMessage = messages.getFirst();
@@ -210,7 +193,7 @@ public class ForumManager extends ListenerAdapter {
                             .stream()
                             .map(ForumTag::getIdLong)
                             .toList());
-                    currentTagIds.add(Tag.OPEN);
+                    currentTagIds.add(ForumTags.OPEN.getId());
                     ArrayList<ForumTagSnowflake> snowflakes = new ArrayList<>();
                     for (Long tagid : currentTagIds) {
                         snowflakes.add(ForumTagSnowflake.fromId(tagid));
@@ -270,11 +253,17 @@ public class ForumManager extends ListenerAdapter {
                     event.reply(":white_check_mark:").queue();
                     closePost(thread, "resolved");
                 } else if (action.equals("invalid") && staff) {
+                    OptionMapping note = event.getOption("note");
                     Aroki.getBot().retrieveUserById(op).queue(
                             user -> user.openPrivateChannel().queue(
                                     privateChannel -> {
-                                        String text = INVALID_MESSAGE(true);
-                                        text = text.replace("{THREAD}", thread.getAsMention());
+                                        String text = INVALID_MESSAGE(true)
+                                                .replace("{THREAD}", thread.getAsMention())
+                                                .replace(
+                                                        "{NOTE}",
+                                                        (note != null) ?
+                                                                "*" + note.getAsString() + " ~" + event.getMember().getEffectiveName() + "*"
+                                                                : "*No notes provided*");
                                         privateChannel
                                                 .sendMessage(text)
                                                 .setActionRow(
@@ -287,7 +276,14 @@ public class ForumManager extends ListenerAdapter {
                                     }
                             )
                     );
-                    event.reply(INVALID_MESSAGE(false)).queue();
+                    event.reply(
+                            INVALID_MESSAGE(false)
+                                    .replace(
+                                            "{NOTE}",
+                                            (note != null) ?
+                                                    "*" + note.getAsString() + "*"
+                                                    : "*No notes provided*")
+                    ).queue();
                     closePost(thread, "invalid");
                 } else if (action.equals("duplicate") && staff){
                     OptionMapping od = event.getOption("duplicate_of");
@@ -295,13 +291,19 @@ public class ForumManager extends ListenerAdapter {
                         event.reply(":x: **You need to set what thread this duplicates!**").setEphemeral(true).queue();
                         return;
                     }
+                    OptionMapping note = event.getOption("note");
                     GuildChannelUnion ad = od.getAsChannel();
                     Aroki.getBot().retrieveUserById(op).queue(
                             user -> user.openPrivateChannel().queue(
                                     privateChannel -> {
                                         String text = DUPLICATE_MESSAGE(true)
                                                 .replace("{THREAD}", thread.getAsMention())
-                                                .replace("{DUPLICATE}", ad.getAsMention());
+                                                .replace("{DUPLICATE}", ad.getAsMention())
+                                                .replace(
+                                                        "{NOTE}",
+                                                        (note != null) ?
+                                                                "*" + note.getAsString() + " ~" + event.getMember().getEffectiveName() + "*"
+                                                                : "*No notes provided*");
                                         privateChannel
                                                 .sendMessage(text)
                                                 .setActionRow(
@@ -315,7 +317,12 @@ public class ForumManager extends ListenerAdapter {
                             )
                     );
                     String text = DUPLICATE_MESSAGE(false)
-                            .replace("{DUPLICATE}", ad.getAsMention());
+                            .replace("{DUPLICATE}", ad.getAsMention())
+                            .replace(
+                                    "{NOTE}",
+                                    (note != null) ?
+                                            "*" + note.getAsString() + "*"
+                                            : "*No notes provided*");
                     event.reply(text).queue();
                     closePost(thread, "duplicate");
                 } else {
@@ -346,7 +353,7 @@ public class ForumManager extends ListenerAdapter {
                                 .stream()
                                 .map(ForumTag::getIdLong)
                                 .toList());
-                        if (tags.contains(Tag.TO_DO) || thread.isPinned()) continue;
+                        if (tags.contains(ForumTags.TO_DO.getId()) || thread.isPinned()) continue;
                         lastReminded = Long.parseLong(ForumData.getEntryValue(entry, "last_reminded"));
                         long currentTime = System.currentTimeMillis();
                         if (currentTime - lastReminded >= 72 * 60 * 60 * 1000) {
