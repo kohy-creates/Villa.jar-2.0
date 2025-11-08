@@ -31,7 +31,13 @@ import java.util.zip.GZIPInputStream;
 public class LogUploader extends ListenerAdapter {
 
     private static final List<String> DISCONTINUED_VERSIONS = List.of(
-            "1.20.*"
+            "1.20.4",
+            "1.20.6",
+            "1.21.1",
+            "1.21.4",
+            "1.21.7",
+            "1.21.8",
+            "1.21.6"
     );
 
     private static final File LOGS_FOLDER;
@@ -227,7 +233,7 @@ public class LogUploader extends ListenerAdapter {
         gzip.delete();
     }
 
-    public static boolean isDiscontinued(String version) {
+    private static boolean isDiscontinued(String version) {
         for (String discontinuedPattern : DISCONTINUED_VERSIONS) {
             String regex = discontinuedPattern.replace("*", ".*");
             Pattern pattern = Pattern.compile(regex);

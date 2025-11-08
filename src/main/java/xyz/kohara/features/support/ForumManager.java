@@ -35,19 +35,11 @@ public class ForumManager extends ListenerAdapter {
     private static final int INTERVAL_MINUTES = 15;
 
     private static class Tag {
-        public static final Long OPEN;
-        public static final Long RESOLVED;
-        public static final Long INVALID;
-        public static final Long TO_DO;
-
-
-        static {
-            OPEN = parseConfig("open_tag_id");
-            RESOLVED = parseConfig("resolved_tag_id");
-            INVALID = parseConfig("invalid_tag_id");
-            TO_DO = parseConfig("to_do_tag_id");
-
-        }
+        public static final Long OPEN = parseConfig("open_tag_id");
+        public static final Long RESOLVED = parseConfig("resolved_tag_id");
+        public static final Long INVALID = parseConfig("invalid_tag_id");
+        public static final Long TO_DO = parseConfig("to_do_tag_id");
+        public static final Long DUPLICATE = parseConfig("duplicate_tag_id");
 
         private static Long parseConfig(String key) {
             String value = Config.getOption(key);
@@ -59,7 +51,6 @@ public class ForumManager extends ListenerAdapter {
     }
 
     private static String CLOSE_COMMAND;
-
     static {
         Aroki.getServer().retrieveCommands().queue(
                 commands -> {
@@ -123,6 +114,7 @@ public class ForumManager extends ListenerAdapter {
                 .map(ForumTag::getIdLong)
                 .toList());
         switch (reason) {
+            case "duplicate" -> currentTagIds.add(Tag.DUPLICATE);
             case "invalid" -> currentTagIds.add(Tag.INVALID);
             case "resolved" -> currentTagIds.add(Tag.RESOLVED);
         }
@@ -144,7 +136,6 @@ public class ForumManager extends ListenerAdapter {
     }
 
     private boolean isSupportThread(ThreadChannel thread) {
-        assert SUPPORT_CHANNEL != null;
         List<ThreadChannel> supportThreads = SUPPORT_CHANNEL.getThreadChannels();
         return supportThreads.contains(thread);
     }
@@ -303,7 +294,9 @@ public class ForumManager extends ListenerAdapter {
                     for (String entry : threads) {
                         long lastReminded;
                         ThreadChannel thread = Aroki.getServer().getThreadChannelById(entry);
-                        if (thread == null) return;
+                        if (thread == null) {
+                            continue;
+                        };
                         List<Long> tags = new ArrayList<>(thread.getAppliedTags()
                                 .stream()
                                 .map(ForumTag::getIdLong)

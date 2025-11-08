@@ -1,4 +1,4 @@
-package xyz.kohara.commands;
+package xyz.kohara.features.commands;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

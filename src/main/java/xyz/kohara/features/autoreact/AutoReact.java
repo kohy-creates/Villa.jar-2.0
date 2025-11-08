@@ -28,7 +28,9 @@ public class AutoReact extends ListenerAdapter {
             Map<Integer, Map<String, Object>> rawConfig = gson.fromJson(reader, type);
 
             for (Map.Entry<Integer, Map<String, Object>> entry : rawConfig.entrySet()) {
+                @SuppressWarnings("unchecked")
                 List<String> phrases = (List<String>) entry.getValue().get("phrases");
+                @SuppressWarnings("unchecked")
                 List<String> reactions = (List<String>) entry.getValue().get("reactions");
 
                 for (String phrase : phrases) {
@@ -36,7 +38,7 @@ public class AutoReact extends ListenerAdapter {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
