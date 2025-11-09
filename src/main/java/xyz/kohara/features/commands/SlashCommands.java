@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import xyz.kohara.features.commands.slash.ServerCommand;
+import xyz.kohara.features.moderation.ModerationSlashCommands;
 import xyz.kohara.features.music.MusicSlashCommands;
 
 import java.util.ArrayList;
@@ -50,5 +51,6 @@ public class SlashCommands {
         );
 
         COMMANDS.addAll(MusicSlashCommands.MUSIC_COMMANDS);
+        COMMANDS.addAll(ModerationSlashCommands.MODERATION_COMMANDS);
     }
 }

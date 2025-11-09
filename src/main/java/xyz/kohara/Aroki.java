@@ -5,6 +5,10 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import xyz.kohara.features.*;
 import xyz.kohara.features.autoreact.AutoReact;
@@ -58,7 +62,8 @@ public class Aroki {
                 new MusicPlayer(),
                 new MCBugs(),
                 new AutoRole(),
-                new Quote()
+                new Quote()/*,
+                new WarnCommand()*/
         );
         listeners.forEach(BOT::addEventListener);
 
@@ -81,6 +86,23 @@ public class Aroki {
     }
     public static boolean isDev(Member member) {
         return member.getRoles().contains(DEV_ROLE);
+    }
+
+    public static void sendDM(User member, String text) {
+        member.openPrivateChannel().queue(privateChannel -> {
+            privateChannel.sendMessage(text)
+                    .setActionRow(
+                            Button.of(
+                                    ButtonStyle.PRIMARY,
+                                    "sent_from", "Sent from " + Aroki.getServer().getName(), Emoji.fromFormatted("<:paper_plane:1358007565614710785>")
+                            ).asDisabled()
+                    )
+                    .queue();
+        });
+    }
+
+    public static void sendDM(Member member, String text) {
+        sendDM(member.getUser(), text);
     }
 
     public static String toSmallUnicode(String s) {

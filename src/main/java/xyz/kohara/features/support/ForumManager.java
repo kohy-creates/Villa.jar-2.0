@@ -255,25 +255,13 @@ public class ForumManager extends ListenerAdapter {
                 } else if (action.equals("invalid") && staff) {
                     OptionMapping note = event.getOption("note");
                     Aroki.getBot().retrieveUserById(op).queue(
-                            user -> user.openPrivateChannel().queue(
-                                    privateChannel -> {
-                                        String text = INVALID_MESSAGE(true)
-                                                .replace("{THREAD}", thread.getAsMention())
-                                                .replace(
-                                                        "{NOTE}",
-                                                        (note != null) ?
-                                                                "*" + note.getAsString() + " ~" + event.getMember().getEffectiveName() + "*"
-                                                                : "*No notes provided*");
-                                        privateChannel
-                                                .sendMessage(text)
-                                                .setActionRow(
-                                                        Button.of(
-                                                            ButtonStyle.PRIMARY,
-                                                            "sent_from", "Sent from " + Aroki.getServer().getName(), Emoji.fromFormatted("<:paper_plane:1358007565614710785>")
-                                                        ).asDisabled()
-                                                )
-                                                .queue();
-                                    }
+                            user -> Aroki.sendDM(user, INVALID_MESSAGE(true)
+                                    .replace("{THREAD}", thread.getAsMention())
+                                    .replace(
+                                            "{NOTE}",
+                                            (note != null) ?
+                                                    "*" + note.getAsString() + " ~" + event.getMember().getEffectiveName() + "*"
+                                                    : "*No notes provided*")
                             )
                     );
                     event.reply(
@@ -294,26 +282,14 @@ public class ForumManager extends ListenerAdapter {
                     OptionMapping note = event.getOption("note");
                     GuildChannelUnion ad = od.getAsChannel();
                     Aroki.getBot().retrieveUserById(op).queue(
-                            user -> user.openPrivateChannel().queue(
-                                    privateChannel -> {
-                                        String text = DUPLICATE_MESSAGE(true)
-                                                .replace("{THREAD}", thread.getAsMention())
-                                                .replace("{DUPLICATE}", ad.getAsMention())
-                                                .replace(
-                                                        "{NOTE}",
-                                                        (note != null) ?
-                                                                "*" + note.getAsString() + " ~" + event.getMember().getEffectiveName() + "*"
-                                                                : "*No notes provided*");
-                                        privateChannel
-                                                .sendMessage(text)
-                                                .setActionRow(
-                                                        Button.of(
-                                                                ButtonStyle.PRIMARY,
-                                                                "sent_from", "Sent from " + Aroki.getServer().getName(), Emoji.fromFormatted("<:paper_plane:1358007565614710785>")
-                                                        ).asDisabled()
-                                                )
-                                                .queue();
-                                    }
+                            user -> Aroki.sendDM(user, DUPLICATE_MESSAGE(true)
+                                    .replace("{THREAD}", thread.getAsMention())
+                                    .replace("{DUPLICATE}", ad.getAsMention())
+                                    .replace(
+                                            "{NOTE}",
+                                            (note != null) ?
+                                                    "*" + note.getAsString() + " ~" + event.getMember().getEffectiveName() + "*"
+                                                    : "*No notes provided*")
                             )
                     );
                     String text = DUPLICATE_MESSAGE(false)

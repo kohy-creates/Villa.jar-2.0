@@ -1,51 +1,52 @@
-package bot.commands.moderation;
+package xyz.kohara.features.moderation.commands;
 
-import bot.command.CommandCategory;
-import bot.command.CommandContext;
-import bot.command.ICommand;
-import bot.utils.ModerationUtils;
-import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import org.jetbrains.annotations.NotNull;
+import xyz.kohara.Aroki;
+import xyz.kohara.features.moderation.ModerationSaveData;
+import xyz.kohara.features.moderation.ModerationUtils;
 
+import java.awt.*;
 import java.util.List;
 
-public class WarnCommand extends ICommand {
-
-    public WarnCommand() {
-        this.name = "warn";
-        this.help = "gives warning to a user";
-        this.usage = "<@member(s)> [reason]";
-        this.minArgsCount = 1;
-        this.userPermissions = new Permission[]{Permission.KICK_MEMBERS};
-        this.category = CommandCategory.MODERATION;
-    }
+public class WarnCommand extends ListenerAdapter {
 
     @Override
-    public void handle(@NotNull CommandContext ctx) {
-        final Message message = ctx.getMessage();
-        List<Member> targetMembers = message.getMentionedMembers();
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
 
-        if (targetMembers.isEmpty()) {
-            ctx.reply("Please @mention the member(s) you want to warn!");
+        Member responsible = event.getMember();
+        if (ModerationUtils.shouldStop(responsible)) return;
+
+        String command = event.getName();
+        if (!command.equals("warn")) return;
+
+        Member member = event.getOption("member").getAsMember();
+        if (member.getUser().isBot()) {
+            event.reply(":x: **Can't warn a bot**").setEphemeral(true).queue();
             return;
         }
 
-        if (targetMembers.stream().anyMatch((target) -> target.getUser().isBot()))
-            ctx.reply("Skipping bot's from warning!");
+        OptionMapping opt = event.getOption("reason");
+        String reason = (opt == null) ? "*No reason provided*" : "*" + opt.getAsString() + "*";
 
-        // Split content at last member mention
-        String[] split = message.getContentRaw().split(targetMembers.get(targetMembers.size() - 1).getId() + "> ");
-        final String reason = split.length > 1 ? split[1] : "No reason provided";
+        EmbedBuilder builder = new EmbedBuilder()
+                .setColor(Color.GREEN)
+                .setDescription(
+                        "***<@" + member.getId() + "> was warned.*** | " + reason
+                );
 
-        targetMembers
-                .stream()
-                // Filter out members with which bot and command author can interact
-                .filter(target -> !target.getUser().isBot())
-                .filter(target -> ModerationUtils.canInteract(ctx.getMember(), target, "warn", ctx.getChannel()))
-                .forEach(member -> ModerationUtils.warn(message, member, reason));
-
+        ModerationSaveData.saveWarning(member, reason, responsible);
+        event.reply("").addEmbeds(builder.build()).queue();
+        String text = "**You were warned in " + Aroki.getServer().getName() + "**\n> Reason: " + reason + " ~*" + responsible.getEffectiveName() + "*";
+        Aroki.sendDM(member, text);
     }
 
 }
