@@ -1,48 +1,58 @@
-//package xyz.kohara.features.moderation.commands;
-//
-//import net.dv8tion.jda.api.Permission;
-//import net.dv8tion.jda.api.entities.Member;
-//import net.dv8tion.jda.api.entities.Message;
-//import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-//import net.dv8tion.jda.api.hooks.ListenerAdapter;
-//import org.jetbrains.annotations.NotNull;
-//
-//import java.util.List;
-//
-//public class KickCommand extends ListenerAdapter {
-//
-//    public KickCommand() {
-//        this.name = "kick";
-//        this.help = "Kick a member off the server";
-//        this.usage = "<@member(s)> [reason]";
-//        this.minArgsCount = 1;
-//        this.userPermissions = new Permission[]{Permission.KICK_MEMBERS};
-//        this.botPermissions = new Permission[]{Permission.KICK_MEMBERS};
-//        this.category = CommandCategory.MODERATION;
-//    }
-//
-//    @Override
-//    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-//        final Message message = ctx.getMessage();
-//        List<Member> targetMembers = message.getMentionedMembers();
-//
-//        if (targetMembers.isEmpty()) {
-//            ctx.reply("Please @mention the member(s) you want to kick!");
-//            return;
-//        }
-//
-//        // Split content at last member mention
-//        String[] split = message.getContentRaw().split(targetMembers.get(targetMembers.size() - 1).getId() + ">");
-//        final String reason = (split.length > 1)
-//                ? String.join(" ", split[1].split("\\s+")).trim()
-//                : "No reason provided";
-//
-//        targetMembers
-//                .stream()
-//                // Filter out members with which bot and command author can interact
-//                .filter(target -> ModerationUtils.canInteract(ctx.getMember(), target, "kick", ctx.getChannel()))
-//                .forEach(member -> ModerationUtils.kick(message, member, reason));
-//
-//    }
-//
-//}
+package xyz.kohara.features.moderation.commands;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import org.jetbrains.annotations.NotNull;
+import xyz.kohara.Aroki;
+import xyz.kohara.Config;
+import xyz.kohara.features.moderation.ModerationSaveData;
+import xyz.kohara.features.moderation.ModerationUtils;
+
+import java.awt.*;
+
+public class KickCommand extends ListenerAdapter {
+
+    @Override
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+
+        Member responsible = event.getMember();
+        if (ModerationUtils.shouldStop(responsible, event, "kick")) return;
+
+        Member member = event.getOption("member", null, OptionMapping::getAsMember);
+        String reason = event.getOption("reason", "No reason provided", OptionMapping::getAsString);
+
+        EmbedBuilder builder = new EmbedBuilder()
+                .setColor(Color.GREEN)
+                .setDescription(
+                        "***<@" + member.getId() + "> was kicked.*** | " + reason + "\n"
+                );
+
+        event.reply("").addEmbeds(builder.build()).queue();
+
+        ModerationSaveData.saveModerationAction(member, ModerationSaveData.ActionType.KICK, reason, responsible);
+
+        StringBuilder text = new StringBuilder().append(
+                "**You were kicked from " + Aroki.getServer().getName() + "**\n> Reason: *" + reason + "* ~*" + responsible.getEffectiveName() + "*"
+        );
+        text.append("\nYou can still [join back](" + Config.getOption("invite") + "), just *don't* do whatever got you kicked again");
+
+        member.getUser().openPrivateChannel().queue(privateChannel -> {
+            privateChannel.sendMessage(text)
+                    .setActionRow(
+                            Button.of(
+                                    ButtonStyle.PRIMARY,
+                                    "sent_from", "Sent from " + Aroki.getServer().getName(), Emoji.fromFormatted("<:paper_plane:1358007565614710785>")
+                            ).asDisabled()
+                    )
+                    .queue(message -> member.kick().reason(reason).queue());
+        });
+
+
+    }
+}

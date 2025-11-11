@@ -18,9 +18,15 @@ public class ModerationSlashCommands {
 
     static {
         MODERATION_COMMANDS.add(
-                slashCommand("warn", "Warn a user. Self-explanatory")
+                slashCommand("warn", "Warn a user")
                         .addOption(OptionType.USER, "member", "Member to warn", true)
                         .addOption(OptionType.STRING, "reason", "Warning reason")
+        );
+
+        MODERATION_COMMANDS.add(
+                slashCommand("kick", "Kicks a user")
+                        .addOption(OptionType.USER, "member", "Member to kick", true)
+                        .addOption(OptionType.STRING, "reason", "Kick reason")
         );
 
         MODERATION_COMMANDS.add(
@@ -31,6 +37,12 @@ public class ModerationSlashCommands {
 
         MODERATION_COMMANDS.add(
                 slashCommand("warnings", "Get all warnings of a given member")
+                        .addOption(OptionType.USER, "member", "Target member", true)
+                        .addOptions(SlashCommands.SEND_PUBLICLY)
+        );
+
+        MODERATION_COMMANDS.add(
+                slashCommand("modhistory", "Get moderation history of a given member")
                         .addOption(OptionType.USER, "member", "Target member", true)
                         .addOptions(SlashCommands.SEND_PUBLICLY)
         );

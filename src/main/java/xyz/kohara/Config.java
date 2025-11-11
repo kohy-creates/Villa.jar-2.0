@@ -31,7 +31,8 @@ public class Config {
             "to_do_tag_id", "0000",
             "duplicate_tag_id", "0000",
             "tag_prefix", "!",
-            "mortals_role", "0000"
+            "mortals_role", "0000",
+            "invite", "https://example.com/"
     );
 
     static {
@@ -40,7 +41,8 @@ public class Config {
         // Load existing config (or empty if new file)
         Map<String, String> loaded;
         try (FileReader reader = new FileReader(configPath)) {
-            Type type = new TypeToken<HashMap<String, String>>() {}.getType();
+            Type type = new TypeToken<HashMap<String, String>>() {
+            }.getType();
             loaded = new Gson().fromJson(reader, type);
             if (loaded == null) loaded = new HashMap<>();
         } catch (IOException e) {
@@ -79,21 +81,11 @@ public class Config {
             try {
                 file.getParentFile().mkdirs();
                 file.createNewFile();
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-
-
     }
-
-//    public void initConfig() {
-//    }
-
-//    public static Map<String, String> getConfig() {
-//        return CONFIG;
-//    }
 
     public static String getOption(String config) {
         return CONFIG.get(config);

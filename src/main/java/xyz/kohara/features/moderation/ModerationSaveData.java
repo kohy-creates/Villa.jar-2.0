@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.dv8tion.jda.api.entities.Member;
 
+import javax.swing.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +16,9 @@ public class ModerationSaveData {
 
     private static final String SAVE_LOCATION = "data/moderation/";
 
+    /*
+            Warnings
+     */
     public static void saveWarning(Member member, String reason, Member responsibleStaff) {
         File saveFile = new File(SaveLocation.WARNINGS.path);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -105,8 +109,81 @@ public class ModerationSaveData {
         }
     }
 
-    // Records
+    /*
+            Moderation history
+     */
+    public static void saveModerationAction(Member member, ActionType actionType, String reason, Member responsibleStaff) {
+        // Build path: data/moderation/history/<user_id>.json
+        String userId = member.getId();
+        File historyFile = new File(SAVE_LOCATION + "history/" + userId + ".json");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        historyFile.getParentFile().mkdirs();
+
+        HistoryWrapper historyData;
+        try (FileReader reader = new FileReader(historyFile)) {
+            historyData = gson.fromJson(reader, HistoryWrapper.class);
+        } catch (IOException e) {
+            historyData = null;
+        }
+
+        if (historyData == null) {
+            historyData = new HistoryWrapper(new ArrayList<>());
+        }
+
+        long unixTime = System.currentTimeMillis() / 1000L;
+        ModerationAction action = new ModerationAction(actionType, reason, responsibleStaff.getId(), unixTime);
+
+        historyData.history().add(action);
+
+        try (FileWriter writer = new FileWriter(historyFile)) {
+            gson.toJson(historyData, writer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<ModerationAction> getHistory(Member member) {
+        File historyFile = new File(SAVE_LOCATION + "history/" + member.getId() + ".json");
+        if (!historyFile.exists()) return new ArrayList<>();
+
+        try (FileReader reader = new FileReader(historyFile)) {
+            HistoryWrapper wrapper = new Gson().fromJson(reader, HistoryWrapper.class);
+            return wrapper != null ? wrapper.history() : new ArrayList<>();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    /// Records
+    // Single warning
     public record Warning(long date, String reason, String responsible) {
+    }
+
+    // JSON container record
+    public record HistoryWrapper(List<ModerationAction> history) {
+    }
+
+    // Single moderation entry
+    public record ModerationAction(ActionType actionType, String reason, String responsible, long date) {
+    }
+
+    public enum ActionType {
+        KICK("kick"),
+        BAN("ban"),
+        TIMEOUT("timeout"),
+        WARN("warn");
+
+        private final String type;
+
+        ActionType(String type) {
+            this.type = type;
+        }
+
+        public String get() {
+            return this.type;
+        }
     }
 
     // Save locations as enums because I can do that

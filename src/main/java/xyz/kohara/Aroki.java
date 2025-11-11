@@ -7,28 +7,16 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.requests.GatewayIntent;
-import xyz.kohara.features.*;
-import xyz.kohara.features.autoreact.AutoReact;
-import xyz.kohara.features.commands.slash.AvatarCommand;
-import xyz.kohara.features.commands.slash.ServerCommand;
+import org.reflections.Reflections;
 import xyz.kohara.features.commands.SlashCommands;
-import xyz.kohara.features.commands.slash.TagListCommand;
-import xyz.kohara.features.moderation.commands.DelWarnCommand;
-import xyz.kohara.features.moderation.commands.WarnCommand;
-import xyz.kohara.features.moderation.commands.WarningsCommand;
-import xyz.kohara.features.music.MusicPlayer;
-import xyz.kohara.status.BotActivity;
 import xyz.kohara.features.support.ForumManager;
-import xyz.kohara.features.tags.MessageListener;
+import xyz.kohara.status.BotActivity;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,29 +43,35 @@ public class Aroki {
         STAFF_ROLE = BOT.getRoleById(Config.getOption("staff_role_id"));
         DEV_ROLE = BOT.getRoleById(Config.getOption("dev_role_id"));
 
-        List<Object> listeners = List.of(
-                new MessageListener(),
-                new ServerCommand(),
-                new TagListCommand(),
-                new AvatarCommand(),
-                new LogUploader(),
-                new AutoReact(),
-                new ForumManager(),
-                new MusicPlayer(),
-                new MCBugs(),
-                new AutoRole(),
-                new Quote(),
-                new WarnCommand(),
-                new WarningsCommand(),
-                new DelWarnCommand()
-        );
-        listeners.forEach(BOT::addEventListener);
+        // Add all listeners dynamically through a reflection
+        getAllListeners().forEach(listenerAdapter -> {
+            BOT.addEventListener(listenerAdapter);
+            log("Added listener " + listenerAdapter.toString().split("@")[0] + " to bot " + BOT_NAME);
+        });
 
         Aroki.BASEMENT.updateCommands().addCommands(SlashCommands.COMMANDS).queue();
         ForumManager.scheduleReminderCheck();
         BotActivity.schedule();
 
         log(BOT_NAME + " has successfully finished startup", Level.INFO);
+    }
+
+    private static List<ListenerAdapter> getAllListeners() {
+        List<ListenerAdapter> listeners = new ArrayList<>();
+
+        Reflections reflections = new Reflections("xyz.kohara.features");
+        Set<Class<? extends ListenerAdapter>> classes = reflections.getSubTypesOf(ListenerAdapter.class);
+
+        for (Class<? extends ListenerAdapter> clazz : classes) {
+            try {
+                listeners.add(clazz.getDeclaredConstructor().newInstance());
+            } catch (Exception e) {
+                log("Failed to load listener: " + clazz.getName(), Level.SEVERE);
+                throw new RuntimeException(e);
+            }
+        }
+
+        return listeners;
     }
 
     public static Guild getServer() {
@@ -132,6 +126,10 @@ public class Aroki {
             result.append(map.getOrDefault(c, c));
         }
         return result.toString();
+    }
+
+    public static void log(String text) {
+        log(text, Level.INFO);
     }
 
     public static void log(String text, Level level) {

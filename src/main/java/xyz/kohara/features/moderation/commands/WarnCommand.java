@@ -31,11 +31,12 @@ public class WarnCommand extends ListenerAdapter {
             return;
         }
 
-        OptionMapping opt = event.getOption("reason");
-        String reason = (opt == null) ? "*No reason provided*" : "*" + opt.getAsString() + "*";
+        String reason = event.getOption("reason", "*No reason provided*", OptionMapping::getAsString);
 
         ModerationSaveData.saveWarning(member, reason, responsible);
         List<ModerationSaveData.Warning> warnings = ModerationSaveData.getWarnings(member);
+
+        ModerationSaveData.saveModerationAction(member, ModerationSaveData.ActionType.WARN, reason, responsible);
 
         EmbedBuilder builder = new EmbedBuilder()
                 .setColor(Color.GREEN)
