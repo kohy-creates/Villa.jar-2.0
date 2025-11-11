@@ -16,6 +16,8 @@ public class SlashCommands {
     public static final ArrayList<CommandData> COMMANDS = new ArrayList<>();
     private static final String SEND_PUBLICLY_TIP = "Share the output with everyone?";
 
+    public static final OptionData SEND_PUBLICLY = new OptionData(OptionType.BOOLEAN, "public", SlashCommands.SEND_PUBLICLY_TIP, false);
+
     static {
         COMMANDS.add(Commands.slash("ping", "Pong!"));
 
@@ -25,16 +27,16 @@ public class SlashCommands {
         }
 
         COMMANDS.add(Commands.slash("discord", "Get links for other Discord servers")
-                .addOptions(serverOption,
-                        new OptionData(OptionType.BOOLEAN, "public", SEND_PUBLICLY_TIP, false)));
+                .addOptions(serverOption, SEND_PUBLICLY)
+        );
 
         COMMANDS.add(Commands.slash("tags", "List all registered tags")
-                .addOption(OptionType.BOOLEAN, "public", SEND_PUBLICLY_TIP, false)
+                .addOptions(SEND_PUBLICLY)
         );
 
         COMMANDS.add(Commands.slash("avatar", "Returns the avatar (profile picture) of the chosen user")
                 .addOption(OptionType.USER, "user", "User", true)
-                .addOption(OptionType.BOOLEAN, "public", SEND_PUBLICLY_TIP, false)
+                .addOptions(SEND_PUBLICLY)
         );
 
         COMMANDS.add(Commands.slash("close", "Closes the support thread")

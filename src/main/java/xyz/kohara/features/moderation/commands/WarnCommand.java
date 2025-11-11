@@ -23,12 +23,9 @@ public class WarnCommand extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
 
         Member responsible = event.getMember();
-        if (ModerationUtils.shouldStop(responsible)) return;
+        if (ModerationUtils.shouldStop(responsible, event, "warn")) return;
 
-        String command = event.getName();
-        if (!command.equals("warn")) return;
-
-        Member member = event.getOption("member").getAsMember();
+        Member member = event.getOption("member", null, OptionMapping::getAsMember);
         if (member.getUser().isBot()) {
             event.reply(":x: **Can't warn a bot**").setEphemeral(true).queue();
             return;
@@ -37,14 +34,18 @@ public class WarnCommand extends ListenerAdapter {
         OptionMapping opt = event.getOption("reason");
         String reason = (opt == null) ? "*No reason provided*" : "*" + opt.getAsString() + "*";
 
+        ModerationSaveData.saveWarning(member, reason, responsible);
+        List<ModerationSaveData.Warning> warnings = ModerationSaveData.getWarnings(member);
+
         EmbedBuilder builder = new EmbedBuilder()
                 .setColor(Color.GREEN)
                 .setDescription(
-                        "***<@" + member.getId() + "> was warned.*** | " + reason
+                        "***<@" + member.getId() + "> was warned.*** | " + reason + "\n" +
+                                "This is their " + Aroki.ordinal(warnings.size()) + " warning."
                 );
 
-        ModerationSaveData.saveWarning(member, reason, responsible);
         event.reply("").addEmbeds(builder.build()).queue();
+
         String text = "**You were warned in " + Aroki.getServer().getName() + "**\n> Reason: " + reason + " ~*" + responsible.getEffectiveName() + "*";
         Aroki.sendDM(member, text);
     }

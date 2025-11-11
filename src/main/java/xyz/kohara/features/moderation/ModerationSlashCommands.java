@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import xyz.kohara.features.commands.SlashCommands;
 
 import java.util.ArrayList;
 
@@ -14,11 +15,24 @@ public class ModerationSlashCommands {
     }
 
     public static final ArrayList<CommandData> MODERATION_COMMANDS = new ArrayList<>();
+
     static {
-//        MODERATION_COMMANDS.add(
-//                slashCommand("warn", "Warn a user. Self-explanatory")
-//                        .addOption(OptionType.USER, "member", "Member to warn", true)
-//                        .addOption(OptionType.STRING, "reason", "Warning reason")
-//        );
+        MODERATION_COMMANDS.add(
+                slashCommand("warn", "Warn a user. Self-explanatory")
+                        .addOption(OptionType.USER, "member", "Member to warn", true)
+                        .addOption(OptionType.STRING, "reason", "Warning reason")
+        );
+
+        MODERATION_COMMANDS.add(
+                slashCommand("delwarn", "Warn a user. Self-explanatory")
+                        .addOption(OptionType.USER, "member", "Member to warn", true)
+                        .addOption(OptionType.INTEGER, "warning", "Warning number (see /warnings)", true)
+        );
+
+        MODERATION_COMMANDS.add(
+                slashCommand("warnings", "Get all warnings of a given member")
+                        .addOption(OptionType.USER, "member", "Target member", true)
+                        .addOptions(SlashCommands.SEND_PUBLICLY)
+        );
     }
 }

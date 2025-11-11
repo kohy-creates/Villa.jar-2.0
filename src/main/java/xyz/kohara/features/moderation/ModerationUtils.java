@@ -1,32 +1,17 @@
 package xyz.kohara.features.moderation;
 
-import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.requests.restaction.order.RoleOrderAction;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import xyz.kohara.Aroki;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.regex.Pattern;
 
 public class ModerationUtils {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ModerationUtils.class);
-    private final static Pattern linkCheck = Pattern.compile("^(?:https?|ftp):\\/\\/[^\\s/$.?#].[^\\s]*$");
+//    private final static Pattern linkCheck = Pattern.compile("^(?:https?|ftp)://[^\\s/$.?#].\\S*$");
 
-    public static boolean shouldStop(Member member) {
-        return !Aroki.isStaff(member);
+    public static boolean shouldStop(Member member, SlashCommandInteractionEvent event, String command) {
+        return !Aroki.isStaff(member) || !event.getName().equals(command);
     }
+
 
 //    @Nullable
 //    public static Role createMutedRole(@NotNull Guild guild) {

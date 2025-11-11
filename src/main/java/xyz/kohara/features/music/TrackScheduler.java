@@ -29,7 +29,7 @@ public class TrackScheduler extends AudioEventAdapter {
     public void queue(AudioTrack track) {
         if (!PLAYER.startTrack(track, true)) {
             if (!QUEUE.offer(track)) {
-                Aroki.log(TrackScheduler.class.getName(), "Failed to add track to the queue!", Level.SEVERE);
+                Aroki.log("Failed to add track to the queue!", Level.SEVERE);
             };
         }
     }

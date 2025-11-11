@@ -16,6 +16,9 @@ import xyz.kohara.features.commands.slash.AvatarCommand;
 import xyz.kohara.features.commands.slash.ServerCommand;
 import xyz.kohara.features.commands.SlashCommands;
 import xyz.kohara.features.commands.slash.TagListCommand;
+import xyz.kohara.features.moderation.commands.DelWarnCommand;
+import xyz.kohara.features.moderation.commands.WarnCommand;
+import xyz.kohara.features.moderation.commands.WarningsCommand;
 import xyz.kohara.features.music.MusicPlayer;
 import xyz.kohara.status.BotActivity;
 import xyz.kohara.features.support.ForumManager;
@@ -25,6 +28,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,10 +37,10 @@ public class Aroki {
     private static final String token = Config.getOption("token");
     private static final GatewayIntent[] intents = {GatewayIntent.GUILD_MESSAGES, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS};
 
-    public static JDA BOT;
-    public static final String BOT_NAME = Config.getOption("bot_name");
-    public static Guild BASEMENT;
-    public static Role STAFF_ROLE, DEV_ROLE;
+    private static JDA BOT;
+    private static final String BOT_NAME = Config.getOption("bot_name");
+    private static Guild BASEMENT;
+    private static Role STAFF_ROLE, DEV_ROLE;
 
     public static void main(String[] args) throws Exception {
 
@@ -62,8 +66,10 @@ public class Aroki {
                 new MusicPlayer(),
                 new MCBugs(),
                 new AutoRole(),
-                new Quote()/*,
-                new WarnCommand()*/
+                new Quote(),
+                new WarnCommand(),
+                new WarningsCommand(),
+                new DelWarnCommand()
         );
         listeners.forEach(BOT::addEventListener);
 
@@ -71,12 +77,13 @@ public class Aroki {
         ForumManager.scheduleReminderCheck();
         BotActivity.schedule();
 
-        log(Aroki.class.getName(), "Bot " + BOT_NAME + " has successfully finished startup", Level.INFO);
+        log(BOT_NAME + " has successfully finished startup", Level.INFO);
     }
 
     public static Guild getServer() {
         return BASEMENT;
     }
+
     public static JDA getBot() {
         return BOT;
     }
@@ -84,6 +91,7 @@ public class Aroki {
     public static boolean isStaff(Member member) {
         return member.getRoles().contains(STAFF_ROLE);
     }
+
     public static boolean isDev(Member member) {
         return member.getRoles().contains(DEV_ROLE);
     }
@@ -105,7 +113,15 @@ public class Aroki {
         sendDM(member.getUser(), text);
     }
 
-    public static String toSmallUnicode(String s) {
+    public static String ordinal(int i) {
+        String[] suffixes = new String[]{"th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"};
+        return switch (i % 100) {
+            case 11, 12, 13 -> i + "th";
+            default -> i + suffixes[i % 10];
+        };
+    }
+
+    public static String smallUnicode(String s) {
         Map<Character, Character> map = new HashMap<>();
         String[] mappings = {"aᴀ", "bʙ", "cᴄ", "dᴅ", "eᴇ", "fꜰ", "gɢ", "hʜ", "iɪ", "jᴊ", "kᴋ", "lʟ", "mᴍ", "nɴ", "oᴏ", "pᴘ", "rʀ", "sѕ", "tᴛ", "uᴜ", "wᴡ", "xх", "yʏ", "zᴢ"};
         for (String pair : mappings) {
@@ -118,7 +134,9 @@ public class Aroki {
         return result.toString();
     }
 
-    public static void log(String CLASS, String text, Level level) {
-        Logger.getLogger(CLASS).log(level, text);
+    public static void log(String text, Level level) {
+        Logger.getLogger(
+                StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass().getName()
+        ).log(level, text);
     }
 }

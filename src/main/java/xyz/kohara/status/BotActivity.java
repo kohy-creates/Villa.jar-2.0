@@ -29,22 +29,17 @@ public class BotActivity {
             for (String key : activityMap.keySet()) {
                 List<String> text = activityMap.get(key);
                 for (String entry : text) {
-                    Activity.ActivityType type = null;
-                    boolean streaming = false;
+                    Activity status;
                     switch (key) {
-                        case "watching" -> type = Activity.ActivityType.WATCHING;
-                        case "normal" -> type = Activity.ActivityType.CUSTOM_STATUS;
-                        case "playing" -> type = Activity.ActivityType.PLAYING;
-                        case "listening" -> type = Activity.ActivityType.LISTENING;
-                        case "streaming" -> {
-                            // Streaming gets special treatment because it requires a URL address
-                            streaming = true;
-                            type = Activity.ActivityType.STREAMING;
-                        }
-                        case "competing" -> type = Activity.ActivityType.COMPETING;
+                        case "watching" -> status = Activity.watching(replacePlaceholders(entry));
+                        case "playing" -> status = Activity.playing(replacePlaceholders(entry));
+                        case "listening" -> status = Activity.listening(replacePlaceholders(entry));
+                        case "competing" -> status = Activity.competing(replacePlaceholders(entry));
+                        case "streaming" ->
+                                status = Activity.streaming(replacePlaceholders(entry), statusData.getStreamingURL());
+                        case "normal" -> status = Activity.customStatus(replacePlaceholders(entry));
+                        default -> throw new IllegalStateException("Unexpected activity key: " + key);
                     }
-                    assert type != null;
-                    Activity status = Activity.of(type, replacePlaceholders(entry), (streaming) ? statusData.getStreamingURL() : null);
                     STATUS_LIST.add(status);
                 }
             }
